@@ -1,0 +1,158 @@
+#!/usr/bin/env python 
+# -*- coding: utf-8 -*-
+# Made by lar-technologies http://www.lar-tech.ru (c) 2016
+
+
+import pygtk
+pygtk.require("2.0")
+import gtk, gobject
+import time
+import gladevcp.makepins
+from gladevcp.gladebuilder import GladeBuilder
+import hal
+import linuxcnc
+import hal_glib
+import sys, os
+import gladevcp
+import os
+import ConfigParser
+import gladevcp.hal_mdihistory 
+import subprocess
+import signal
+import re
+from math import * 
+
+glade_file = "lar-goniometer.glade"
+CFG = "lar-goniometer.cfg"
+DA = 30.
+to_rad = pi/180.
+to_grad = 180./pi
+
+class goniometer(object):
+	def __init__(self):
+		self.ini_file  = sys.argv[2]
+		print "Using ini file: %s"%self.ini_file			
+		self.ini = linuxcnc.ini(self.ini_file)
+		self.c = linuxcnc.command()
+		self.err = linuxcnc.error_channel()	
+		self.stat = linuxcnc.stat()
+		self.h_find_pos = [(),()]
+		self.init_glade()		
+		postgui_halfile = self.ini.find("HAL", "POSTGUI_HALFILE")		
+		print "LAR: Loading postgui hal file: %s"%postgui_halfile
+		p = subprocess.Popen(['halcmd', '-i', self.ini_file, "-f", postgui_halfile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		out, err = p.communicate()
+		print "LAR: Postgui load status out: %s err: %s"%(out,err)
+		self.updating_inputs = False
+		self.load_config()
+	#	gobject.timeout_add_seconds(1, self.error_watch)		
+
+	def save_config(self, *arg) :
+		if self.updating_inputs : 
+			return
+		f = open(CFG,"w")
+		for key, value in self.config.items("WIDGETS") :
+			w = self.builder.get_object(key)
+			if w != None :
+				self.config.set("WIDGETS",key,w.get_text())
+		self.config.write(f)
+		f.close()
+
+	def load_config(self) :
+		self.config = ConfigParser.ConfigParser()
+		self.config.read(CFG)			
+		self.updating_inputs = True
+		for key, value in self.config.items("WIDGETS") :
+			w = self.builder.get_object(key)
+			if w != None :
+				w.set_text(value)
+		self.updating_inputs = False
+	
+	def init_glade(self) :
+		self.builder = gtk.Builder()
+		self.builder.add_from_file(glade_file)
+		self.builder.connect_signals(self)
+
+		self.halcomp = hal.component("lar")
+		panel = gladevcp.makepins.GladePanel( self.halcomp, glade_file, self.builder, None)		
+		self.window = self.builder.get_object("window1")
+		self.window.show()
+		self.connect_signals()
+
+	def connect_signals(self) :
+		#self.window.connect("destroy",self.quit)
+		self.window.connect("key-press-event", self.on_key_down)
+		self.window.connect("delete-event", self.on_window_destroy)		
+		self.builder.get_object("h_find1").connect("clicked", self.goto, None,None,None,0.,0.)
+		self.builder.get_object("h_find3").connect("clicked", self.goto, None,None,None,DA,0.)
+		self.builder.get_object("h_find2").connect("clicked", self.h_find, 2)
+		self.builder.get_object("h_find4").connect("clicked", self.h_find, 4)
+		self.builder.get_object("h_find").connect("changed", self.save_config)
+		
+	def h_find(self,w,n) :
+		if n==2 :
+			# save 1st pos
+			self.stat.poll()
+			print self.stat.actual_position
+			#print help(self.stat.actual_position)
+			self.h_find_pos[0] = self.stat.actual_position
+		if n==4 :
+			# save 1st pos
+			self.stat.poll()
+			print self.stat.actual_position
+			#print help(self.stat.actual_position)
+			self.h_find_pos[1] = self.stat.actual_position
+			
+			dy = self.h_find_pos[1][1] - self.h_find_pos[0][1]  
+			
+			y0 = self.h_find_pos[0][1]
+			y1 = self.h_find_pos[1][1]
+			a = pi/2
+			la = 0
+			while abs(a-la) > 1e-6 :
+				# y1*sin(a) - y0*sin(a+DA) = 0
+				f =  y1*sin(a) - y0*sin(a+DA) 
+				f1 = y1*cos(a) - y0*cos(a+DA) 
+				if f1 == 0 : 
+					break
+				la = a
+				a = a - f/f1
+				print a
+			print a
+			if tan(a) != 0 :
+				h = y0/tan(a)
+			else :
+				h = 0	
+			self.builder.get_object("h_find").set_text(str(h))
+		
+	def error_watch(self, *arg) :
+		e = self.err.poll()
+		print e
+		
+	def on_key_down(self, w, event): 
+		key = event.keyval	
+		if key == 65307 :	
+			self.abort()
+
+	def abort(self) :
+		print "Aborting execution!"
+		self.c.abort()
+	
+	def goto(self,w,x=None,y=None,z=None,a=None,b=None) :
+		c = ""
+		c += " X%s"%x if x!=None else ""
+		c += " Y%s"%y if y!=None else ""
+		c += " Z%s"%z if z!=None else ""
+		c += " A%s"%a if z!=None else ""
+		c += " B%s"%b if z!=None else ""
+		self.c.mode(linuxcnc.MODE_MDI)
+		self.c.wait_complete()		
+		self.c.mdi("G0" + c)
+		
+	def on_window_destroy(self, widget, data=None):
+		gtk.main_quit()
+		
+if __name__ == "__main__":
+	app = goniometer()
+	gtk.main() 
+
