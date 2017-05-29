@@ -9,6 +9,7 @@ loadrt hm2_pci
 loadrt pid names=pid.x,pid.y,pid.z,pid.a,pid.b
 loadrt stepgen step_type=0,0,0,0,0 ctrl_type=p,p,p,p,p
 loadrt sum2 count=5
+loadrt logic count=1 personality=261
 
 addf parport.0.read	base-thread
 addf stepgen.make-pulses	base-thread
@@ -31,6 +32,8 @@ addf pid.a.do-pid-calcs	servo-thread
 addf pid.b.do-pid-calcs	servo-thread
 addf stepgen.update-freq	servo-thread
 addf hm2_5i25.0.write	servo-thread
+
+addf logic.0 		servo-thread
 
 setp parport.0.reset-time 5000
 setp sum2.0.gain1 -1
@@ -194,7 +197,6 @@ net a-enable    <=  axis.3.amp-enable-out
 net a-enable	=>  stepgen.3.enable
 net a-step	<=  stepgen.3.step
 net a-dir	<=  stepgen.3.dir
-net a-pos-cmd   <=  axis.3.motor-pos-cmd
 
 
 net a-pos-fb	<=  hm2_5i25.0.encoder.05.position
@@ -243,6 +245,14 @@ net b-pos-rawcounts <=  hm2_5i25.0.encoder.04.rawcounts
 net b-home	=>  axis.4.home-sw-in
 net b-neg-limit	=>  axis.4.neg-lim-sw-in
 net b-pos-limit	=>  axis.4.pos-lim-sw-in
+
+net homed0 	<= axis.0.homed		=> logic.0.in-00
+net homed1 	<= axis.1.homed		=> logic.0.in-01
+net homed2 	<= axis.2.homed		=> logic.0.in-02
+net homed3 	<= axis.3.homed		=> logic.0.in-03
+net homed4 	<= axis.4.homed		=> logic.0.in-04
+net homed 	<= logic.0.and
+
 
 #net  estop-out <= iocontrol.0.user-enable-out
 net  estop-out => iocontrol.0.emc-enable-in

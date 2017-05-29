@@ -1,3 +1,4 @@
+#setp 5axisgui.tool_length 800
 
 #*******************
 # AXIS X
@@ -36,7 +37,7 @@ setp	 hm2_5i25.0.encoder.02.scale			-200
 #*******************
 
 setp	pid.y.Pgain		0
-setp	pid.y.Igain		7
+setp	pid.y.Igain		5
 setp	pid.y.Dgain		0.0
 setp	pid.y.bias		0
 setp	pid.y.FF0		1
@@ -45,7 +46,7 @@ setp	pid.y.FF2		0.0
 
 setp	pid.y.deadband	0.01
 setp	pid.y.maxoutput 0
-setp	pid.y.maxerror	10
+setp	pid.y.maxerror	5
 setp	pid.y.maxerrorI	0
 
 setp	stepgen.1.dirsetup	35000
@@ -107,7 +108,7 @@ setp	pid.a.Dgain		0.0
 setp	pid.a.bias		0
 setp	pid.a.FF0		1
 setp	pid.a.FF1		0.0
-setp	pid.a.FF2		0.00
+setp	pid.a.FF2		0.00	
 setp	pid.a.deadband	0.05
 setp	pid.a.maxoutput 0
 setp	pid.a.maxerror	10

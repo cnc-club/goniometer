@@ -22,8 +22,8 @@ import signal
 import re
 from math import * 
 
-glade_file = "lar-goniometer.glade"
-CFG = "lar-goniometer.cfg"
+glade_file = "gui/lar-goniometer.glade"
+CFG = "gui/lar-goniometer.cfg"
 DA = 30.
 to_rad = pi/180.
 to_grad = 180./pi
@@ -73,7 +73,7 @@ class goniometer(object):
 		self.builder.add_from_file(glade_file)
 		self.builder.connect_signals(self)
 
-		self.halcomp = hal.component("lar")
+		self.halcomp = hal.component("gui")
 		panel = gladevcp.makepins.GladePanel( self.halcomp, glade_file, self.builder, None)		
 		self.window = self.builder.get_object("window1")
 		self.window.show()
@@ -83,11 +83,11 @@ class goniometer(object):
 		#self.window.connect("destroy",self.quit)
 		self.window.connect("key-press-event", self.on_key_down)
 		self.window.connect("delete-event", self.on_window_destroy)		
-		self.builder.get_object("h_find1").connect("clicked", self.goto, None,None,None,0.,0.)
-		self.builder.get_object("h_find3").connect("clicked", self.goto, None,None,None,DA,0.)
-		self.builder.get_object("h_find2").connect("clicked", self.h_find, 2)
-		self.builder.get_object("h_find4").connect("clicked", self.h_find, 4)
-		self.builder.get_object("h_find").connect("changed", self.save_config)
+#		self.builder.get_object("h_find1").connect("clicked", self.goto, None,None,None,0.,0.)
+#		self.builder.get_object("h_find3").connect("clicked", self.goto, None,None,None,DA,0.)
+#		self.builder.get_object("h_find2").connect("clicked", self.h_find, 2)
+#		self.builder.get_object("h_find4").connect("clicked", self.h_find, 4)
+#		self.builder.get_object("h_find").connect("changed", self.save_config)
 		
 	def h_find(self,w,n) :
 		if n==2 :
