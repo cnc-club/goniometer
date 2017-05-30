@@ -4,6 +4,6 @@ net estop	<= gui.estop 		=> halui.estop.activate
 net estop-led	<= gui.estop_led	=> halui.estop.is-activated
 net reset	<= gui.reset 		=> halui.estop.reset
 
-net home	<= gui.home_all		=> halui.home-all
+net home	<= gui.home_all		=> halui.mode.manual		=> halui.home-all
 net homed				=> gui.homed
 

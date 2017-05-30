@@ -22,20 +22,30 @@ import signal
 import re
 from math import * 
 
+d2r = 0.017453292519943295
+r2d = 57.29577951308232
+DEBUG = 100
+
 glade_file = "gui/lar-goniometer.glade"
-CFG = "gui/lar-goniometer.cfg"
+CFG = "gui/cfg/default.cfg"
 DA = 30.
 to_rad = pi/180.
 to_grad = 180./pi
 
 class goniometer(object):
 	def __init__(self):
+		self.x = 0
+		self.y = 0
+		self.z = 0
+		self.a = 0
+		self.b = 0
+		self.abort_status = True
 		self.ini_file  = sys.argv[2]
 		print "Using ini file: %s"%self.ini_file			
 		self.ini = linuxcnc.ini(self.ini_file)
 		self.c = linuxcnc.command()
 		self.err = linuxcnc.error_channel()	
-		self.stat = linuxcnc.stat()
+		self.linuxcnc_stat = linuxcnc.stat()
 		self.h_find_pos = [(),()]
 		self.init_glade()		
 		postgui_halfile = self.ini.find("HAL", "POSTGUI_HALFILE")		
@@ -45,7 +55,20 @@ class goniometer(object):
 		print "LAR: Postgui load status out: %s err: %s"%(out,err)
 		self.updating_inputs = False
 		self.load_config()
-	#	gobject.timeout_add_seconds(1, self.error_watch)		
+		self.get_limits()
+		gobject.timeout_add(100, self.error_watch)
+
+	def get_limits(self) :
+		self.limits = {}
+		s = os.popen("halcmd show pin ini.*limit*").read()
+		for l in s.split("\n") :
+			for i in range(5) :
+				if "ini.%s.min_limit"%i in l :
+					self.limits["min%s"%i] = float(l.split()[3])
+					break
+				if "ini.%s.max_limit"%i in l :
+					self.limits["max%s"%i] = float(l.split()[3])
+					break
 
 	def save_config(self, *arg) :
 		if self.updating_inputs : 
@@ -79,55 +102,122 @@ class goniometer(object):
 		self.window.show()
 		self.connect_signals()
 
+	def get_increment(self) :
+		for i in range(5):
+			w = self.builder.get_object("inc%s"%i)
+			if (w.get_active()) :
+				return float(w.get_label())
+				
+	
+	def check_coords(self,coord) :
+		for i in range(5):
+			if coord[i]>self.limits["max%s"%i] or coord[i]<self.limits["min%s"%i] :
+				print "Move will exceed %s coordinate limits! %s (%s -- %s)"%("XYZAB"[i],coord[i],  self.limits["min%s"%i], self.limits["max%s"%i])
+				return False
+		return True
+		
+	def update_coord(self, coord_) :
+		coord = self.kins(coord_)
+		if not self.check_coords(coord):
+			return
+		self.x = coord_[0]
+		self.y = coord_[1]
+		self.z = coord_[2]
+		self.a = coord_[3]
+		self.b = coord_[4]
+		self.goto_glob(coord)
+		
+	def goto_glob(self, coord) :
+		X,Y,Z,A,B = coord
+		print "G0 X%s Y%s Z%s A%s B%s"%(X,Y,Z,A,B)
+		self.goto(None,X,Y,Z,A,B,G53="G53")
+		
+	def get_p(self,s) :
+		try :
+			return float(self.builder.get_object(s).get_text())
+		except :
+			print "Wrong string to float conversion ('%s')!"%self.builder.get_object(s).get_text()
+			return 0.
+
+	def kins(self, coord) :
+		h = self.get_p("h")
+		a = coord[3]*d2r
+		b = coord[4]*d2r		
+		x,y,z = coord[:3] 
+		h1 = h*cos(a) + y*sin(b) 
+		X = x*sin(-a)+h1*cos(a)+self.get_p("focus") + self.get_p("shift_x")
+		Y = x*cos(a)+h1*sin(a) + self.get_p("shift_y")
+		Z = y*cos(b) + self.get_p("shift_z")
+		A = a*r2d
+		B = b*r2d
+		
+		return X,Y,Z,A,B
+	
+	def move_btn(self,w, x,y,a,b) :
+		inc = self.get_increment()
+		
+		x = self.x + x*inc
+		y = self.y + y*inc
+		z = self.z
+		a = self.a + a*inc
+		b = self.b + b*inc
+		print("xyab>",x,y,a,b)
+		self.update_coord((x,y,z,a,b))
+	
 	def connect_signals(self) :
 		#self.window.connect("destroy",self.quit)
 		self.window.connect("key-press-event", self.on_key_down)
-		self.window.connect("delete-event", self.on_window_destroy)		
-#		self.builder.get_object("h_find1").connect("clicked", self.goto, None,None,None,0.,0.)
-#		self.builder.get_object("h_find3").connect("clicked", self.goto, None,None,None,DA,0.)
-#		self.builder.get_object("h_find2").connect("clicked", self.h_find, 2)
-#		self.builder.get_object("h_find4").connect("clicked", self.h_find, 4)
-#		self.builder.get_object("h_find").connect("changed", self.save_config)
+		self.window.connect("delete-event", self.on_window_destroy)
+		self.builder.get_object("xp").connect("clicked", self.move_btn, 1., 0., 0., 0.)
+		self.builder.get_object("xm").connect("clicked", self.move_btn,-1., 0., 0., 0.)
+		self.builder.get_object("yp").connect("clicked", self.move_btn, 0., 1., 0., 0.)
+		self.builder.get_object("ym").connect("clicked", self.move_btn, 0.,-1., 0., 0.)
+		self.builder.get_object("ap").connect("clicked", self.move_btn, 0., 0., 1., 0.)
+		self.builder.get_object("am").connect("clicked", self.move_btn, 0., 0.,-1., 0.)
+		self.builder.get_object("bp").connect("clicked", self.move_btn, 0., 0., 0., 1.)
+		self.builder.get_object("bm").connect("clicked", self.move_btn, 0., 0., 0.,-1.)
+		self.builder.get_object("start_sphere").connect("clicked", self.scan_sphere)
 		
-	def h_find(self,w,n) :
-		if n==2 :
-			# save 1st pos
-			self.stat.poll()
-			print self.stat.actual_position
-			#print help(self.stat.actual_position)
-			self.h_find_pos[0] = self.stat.actual_position
-		if n==4 :
-			# save 1st pos
-			self.stat.poll()
-			print self.stat.actual_position
-			#print help(self.stat.actual_position)
-			self.h_find_pos[1] = self.stat.actual_position
+		
+	def run_thread(self, *arg) :
+		if self.abort_status == True :
+			self.finish
+			return False
 			
-			dy = self.h_find_pos[1][1] - self.h_find_pos[0][1]  
+		self.linuxcnc_stat.poll()
+		if self.linuxcnc_stat.exec_state == linuxcnc.EXEC_DONE :
+			if self.prog_pos >= len(self.prog) :
+				self.finish
+				return False
+
+			self.goto_glob(self.prog[self.prog_pos])
+			self.prog_pos += 1
 			
-			y0 = self.h_find_pos[0][1]
-			y1 = self.h_find_pos[1][1]
-			a = pi/2
-			la = 0
-			while abs(a-la) > 1e-6 :
-				# y1*sin(a) - y0*sin(a+DA) = 0
-				f =  y1*sin(a) - y0*sin(a+DA) 
-				f1 = y1*cos(a) - y0*cos(a+DA) 
-				if f1 == 0 : 
-					break
-				la = a
-				a = a - f/f1
-				print a
-			print a
-			if tan(a) != 0 :
-				h = y0/tan(a)
-			else :
-				h = 0	
-			self.builder.get_object("h_find").set_text(str(h))
+		self.builder.get_object("progress").set_fraction( self.prog_pos/len(self.prog) )
+		
+		print ".",
+		sys.stdout.flush()
+		return True
+		
+	def finish(self) :
+		self.builder.get_object("progress-dialog").hide()
+ 
+		
+	def start(self) :
+		self.abort_status = False
+		self.prog_pos = 0
+		gobject.timeout_add(200, self.run_thread)		
+		responce = self.builder.get_object("progress-dialog").run()
+		self.abort()
+	
 		
 	def error_watch(self, *arg) :
 		e = self.err.poll()
-		print e
+		if e:
+			if self.abort_status == False : 
+				self.abort()
+			print e[1]
+		return True		
 		
 	def on_key_down(self, w, event): 
 		key = event.keyval	
@@ -135,22 +225,77 @@ class goniometer(object):
 			self.abort()
 
 	def abort(self) :
-		print "Aborting execution!"
 		self.c.abort()
+		self.abort_status = True
+		self.finish()
+		print "Aborting execution!"
 	
-	def goto(self,w,x=None,y=None,z=None,a=None,b=None) :
-		c = ""
+	def goto(self,w,x=None,y=None,z=None,a=None,b=None, G53="") :
+		c = ""+G53
 		c += " X%s"%x if x!=None else ""
 		c += " Y%s"%y if y!=None else ""
 		c += " Z%s"%z if z!=None else ""
-		c += " A%s"%a if z!=None else ""
-		c += " B%s"%b if z!=None else ""
+		c += " A%s"%a if a!=None else ""
+		c += " B%s"%b if b!=None else ""
+		if DEBUG > 10 : 
+			print "G0" + c
 		self.c.mode(linuxcnc.MODE_MDI)
 		self.c.wait_complete()		
 		self.c.mdi("G0" + c)
 		
 	def on_window_destroy(self, widget, data=None):
 		gtk.main_quit()
+		
+
+	def check_prog(self, prog) :
+		for coord in prog : 
+			coord_ = self.kins(coord_)
+			if not self.check_coords(coord):
+				print "Error at coords:", coord_
+				return False
+		return True
+
+	def error_message(self, s) :
+		w = self.builder.get_object("error-message")
+		w.set_text(s)
+		w.show()
+
+	def run_prog(self, prog) :
+		if not self.check_prog:
+			self.error_message("С заданными параметрами программа выходит за пределы рабочей области оборудования")
+			return
+		else : 
+			self.prog = prog
+			self.start()	
+			
+			
+	def scan_sphere(self, *arg) :
+		a_min =		self.get_p("a_min")
+		a_max =		self.get_p("a_max")
+		a_step =	self.get_p("a_step")
+		a_steps = 	int(self.get_p("a_steps"))
+		if a_steps != 0 :
+			a_step = (a_max - a_min)/a_steps
+		elif a_step != 0 :
+			a_steps = int(round((a_max - a_min)/a_step))
+			
+		b_min =		self.get_p("b_min")
+		b_max =		self.get_p("b_max")
+		b_step =	self.get_p("b_step")
+		b_steps = 	int(self.get_p("b_steps"))
+		if b_steps != 0 :
+			b_step = (b_max - b_min)/b_steps
+		elif b_step != 0 :
+			b_steps = int(round((b_max - b_min)/b_step))
+			
+			
+		prog = []
+
+		for i in range(a_steps+1) :
+			for j in range(b_steps+1) :
+				prog.append((self.x,self.y,None,a_min+i*a_step, b_min+j*b_step))			
+				
+		self.run_prog(prog)
 		
 if __name__ == "__main__":
 	app = goniometer()

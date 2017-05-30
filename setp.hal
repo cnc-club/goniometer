@@ -13,7 +13,7 @@ setp	pid.x.FF1		0.0
 setp	pid.x.FF2		0.00
 setp	pid.x.deadband	0.01
 setp	pid.x.maxerror	10
-setp	pid.x.maxerrorI	0
+setp	pid.x.maxerrorI	100
 
 setp	stepgen.0.dirsetup	35000
 setp	stepgen.0.dirhold	35000
@@ -47,7 +47,7 @@ setp	pid.y.FF2		0.0
 setp	pid.y.deadband	0.01
 setp	pid.y.maxoutput 0
 setp	pid.y.maxerror	5
-setp	pid.y.maxerrorI	0
+setp	pid.y.maxerrorI	100
 
 setp	stepgen.1.dirsetup	35000
 setp	stepgen.1.dirhold	35000
@@ -80,7 +80,8 @@ setp	pid.z.FF2		0
 setp	pid.z.deadband	0.01
 setp	pid.z.maxoutput 0
 setp	pid.z.maxerror	10
-setp	pid.z.maxerrorI	0
+setp	pid.z.maxerrorI	100
+
 setp	pid.z.error-previous-target 1
 setp	stepgen.2.dirsetup	35000
 setp	stepgen.2.dirhold	35000
@@ -112,7 +113,7 @@ setp	pid.a.FF2		0.00
 setp	pid.a.deadband	0.05
 setp	pid.a.maxoutput 0
 setp	pid.a.maxerror	10
-setp	pid.a.maxerrorI	0
+setp	pid.a.maxerrorI	20
 
 setp	stepgen.3.dirsetup	35000
 setp	stepgen.3.dirhold	35000
@@ -146,7 +147,7 @@ setp	pid.b.FF2		0.00
 setp	pid.b.deadband	0.05
 setp	pid.b.maxoutput 0
 setp	pid.b.maxerror	10
-setp	pid.b.maxerrorI	0
+setp	pid.b.maxerrorI	20
 
 setp	stepgen.4.dirsetup	35000
 setp	stepgen.4.dirhold	35000
