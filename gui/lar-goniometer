@@ -39,6 +39,8 @@ class goniometer(object):
 		self.z = 0
 		self.a = 0
 		self.b = 0
+		self.start_time = 0
+		self.MDI_COMPLETE = True
 		self.abort_status = True
 		self.ini_file  = sys.argv[2]
 		print "Using ini file: %s"%self.ini_file			
@@ -176,21 +178,22 @@ class goniometer(object):
 		self.builder.get_object("am").connect("clicked", self.move_btn, 0., 0.,-1., 0.)
 		self.builder.get_object("bp").connect("clicked", self.move_btn, 0., 0., 0., 1.)
 		self.builder.get_object("bm").connect("clicked", self.move_btn, 0., 0., 0.,-1.)
+		self.builder.get_object("moveback").connect("clicked", self.move_back)
 		self.builder.get_object("start_sphere").connect("clicked", self.scan_sphere)
 		
 		
 	def run_thread(self, *arg) :
 		if self.abort_status == True :
-			self.finish
+			self.finish()
 			return False
 			
 		self.linuxcnc_stat.poll()
-		if self.linuxcnc_stat.exec_state == linuxcnc.EXEC_DONE :
+		if self.MDI_COMPLETE == True :
 			if self.prog_pos >= len(self.prog) :
-				self.finish
+				self.finish()
 				return False
 
-			self.goto_glob(self.prog[self.prog_pos])
+			self.update_coord(self.prog[self.prog_pos])
 			self.prog_pos += 1
 			
 		self.builder.get_object("progress").set_fraction( self.prog_pos/len(self.prog) )
@@ -198,12 +201,26 @@ class goniometer(object):
 		print ".",
 		sys.stdout.flush()
 		return True
+
+	def get_coord(self) :
+		return self.x,self.y,self.z,self.a,self.b,
+
+	def move_back(self, w) :
+		if w.get_active() :
+			#move back
+			self.goto(None,x=self.limits["max0"],G53="G53")
+		else :
+			self.update_coord(self.get_coord())
 		
 	def finish(self) :
+		t =  time.time() - self.start_time
+		print "Finished scanning. Done in %.0f:%.0f"(t/60,t%60)
 		self.builder.get_object("progress-dialog").hide()
  
 		
 	def start(self) :
+		self.start_time = time.time()
+		print "Start scanning..." 
 		self.abort_status = False
 		self.prog_pos = 0
 		gobject.timeout_add(200, self.run_thread)		
@@ -240,8 +257,11 @@ class goniometer(object):
 		if DEBUG > 10 : 
 			print "G0" + c
 		self.c.mode(linuxcnc.MODE_MDI)
+		self.MDI_COMPLETE = False
 		self.c.wait_complete()		
 		self.c.mdi("G0" + c)
+		self.c.wait_complete()		
+		self.MDI_COMPLETE = True
 		
 	def on_window_destroy(self, widget, data=None):
 		gtk.main_quit()

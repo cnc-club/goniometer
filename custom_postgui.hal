@@ -7,3 +7,17 @@ net reset	<= gui.reset 		=> halui.estop.reset
 net home	<= gui.home_all		=> halui.mode.manual		=> halui.home-all
 net homed				=> gui.homed
 
+
+net mxp		<= gui.mxp		=> halui.jog.0.plus
+net mxm		<= gui.mxm		=> halui.jog.0.minus
+net myp		<= gui.myp		=> halui.jog.1.plus
+net mym		<= gui.mym		=> halui.jog.1.minus
+net mzp		<= gui.mzp		=> halui.jog.2.plus
+net mzm		<= gui.mzm		=> halui.jog.2.minus
+net map		<= gui.map		=> halui.jog.3.plus
+net mam		<= gui.mam		=> halui.jog.3.minus
+net mbp		<= gui.mbp		=> halui.jog.4.plus
+net mbm		<= gui.mbm		=> halui.jog.4.minus
+
+net jog-speed	<= gui.jog_speed	=> halui.jog-speed
+
