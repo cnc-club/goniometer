@@ -87,8 +87,8 @@ setp	stepgen.2.dirsetup	35000
 setp	stepgen.2.dirhold	35000
 setp	stepgen.2.steplen	1
 setp	stepgen.2.stepspace	0
-setp	stepgen.2.maxaccel	400
-setp	stepgen.2.maxvel	50
+setp	stepgen.2.maxaccel	600
+setp	stepgen.2.maxvel	55
 setp	stepgen.2.position-scale	400
 
 setp	 hm2_5i25.0.encoder.00.counter-mode			0

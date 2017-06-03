@@ -28,7 +28,6 @@ DEBUG = 100
 
 glade_file = "gui/lar-goniometer.glade"
 CFG = "gui/cfg/default.cfg"
-DA = 30.
 to_rad = pi/180.
 to_grad = 180./pi
 
@@ -42,6 +41,7 @@ class goniometer(object):
 		self.start_time = 0
 		self.MDI_COMPLETE = True
 		self.abort_status = True
+		self.jogging_cont = False
 		self.ini_file  = sys.argv[2]
 		
 		print "Using ini file: %s"%self.ini_file			
@@ -184,53 +184,142 @@ class goniometer(object):
 		#self.window.connect("destroy",self.quit)
 		self.window.connect("key-press-event", self.on_key_down)
 		self.window.connect("delete-event", self.on_window_destroy)
-		self.builder.get_object("global").connect("toggled", self.local)
+		self.builder.get_object("global").connect("toggled", self.set_mode)
 		self.builder.get_object("moveback").connect("clicked", self.move_back)
 		self.builder.get_object("start_sphere").connect("clicked", self.scan_sphere)
+		self.builder.get_object("jog_keyboard").connect("clicked", self.jog_keyboard)
 
-		self.builder.get_object("xp").connect("clicked", self.jog, 0,  1.)
-		self.builder.get_object("xm").connect("clicked", self.jog, 0, -1.)
-		self.builder.get_object("yp").connect("clicked", self.jog, 1,  1.)
-		self.builder.get_object("ym").connect("clicked", self.jog, 1, -1.)
-		self.builder.get_object("zp").connect("clicked", self.jog, 2,  1.)
-		self.builder.get_object("zm").connect("clicked", self.jog, 2, -1.)
-		self.builder.get_object("ap").connect("clicked", self.jog, 3,  1.)
-		self.builder.get_object("am").connect("clicked", self.jog, 3, -1.)
-		self.builder.get_object("bp").connect("clicked", self.jog, 4,  1.)
-		self.builder.get_object("bm").connect("clicked", self.jog, 4, -1.)
+		self.builder.get_object("jog_dialog").connect("key-press-event", self.jog_on_key_down)
+		self.builder.get_object("jog_dialog").connect("key-release-event", self.jog_on_key_up)
+
+
+		self.builder.get_object("xp").connect("pressed", self.jog, 0,  1.)
+		self.builder.get_object("xm").connect("pressed", self.jog, 0, -1.)
+		self.builder.get_object("yp").connect("pressed", self.jog, 1,  1.)
+		self.builder.get_object("ym").connect("pressed", self.jog, 1, -1.)
+		self.builder.get_object("zp").connect("pressed", self.jog, 2,  1.)
+		self.builder.get_object("zm").connect("pressed", self.jog, 2, -1.)
+		self.builder.get_object("ap").connect("pressed", self.jog, 3,  1.)
+		self.builder.get_object("am").connect("pressed", self.jog, 3, -1.)
+		self.builder.get_object("bp").connect("pressed", self.jog, 4,  1.)
+		self.builder.get_object("bm").connect("pressed", self.jog, 4, -1.)
+
+		self.builder.get_object("xp").connect("released", self.jog_release, 0,  1.)
+		self.builder.get_object("xm").connect("released", self.jog_release, 0, -1.)
+		self.builder.get_object("yp").connect("released", self.jog_release, 1,  1.)
+		self.builder.get_object("ym").connect("released", self.jog_release, 1, -1.)
+		self.builder.get_object("zp").connect("released", self.jog_release, 2,  1.)
+		self.builder.get_object("zm").connect("released", self.jog_release, 2, -1.)
+		self.builder.get_object("ap").connect("released", self.jog_release, 3,  1.)
+		self.builder.get_object("am").connect("released", self.jog_release, 3, -1.)
+		self.builder.get_object("bp").connect("released", self.jog_release, 4,  1.)
+		self.builder.get_object("bm").connect("released", self.jog_release, 4, -1.)
+
+		
 
 	def busy(self):
 	    self.stat.poll()
 	    return self.stat.task_mode == linuxcnc.MODE_AUTO and self.stat.interp_state != linuxcnc.INTERP_IDLE
 
+	def can_jog(self) :
+		self.stat.poll()
+		print self.stat.state
+		print		not self.busy() 
+		print	 not self.stat.state == linuxcnc.STATE_ESTOP
+		print		 not self.stat.state == linuxcnc.STATE_OFF
+		print		 	self.stat.state == linuxcnc.STATE_ON
+		print
+		return  (
+				not self.busy() 
+				and not self.stat.task_state == linuxcnc.STATE_ESTOP
+				and not self.stat.task_state == linuxcnc.STATE_OFF
+				and 	self.stat.task_state == linuxcnc.STATE_ON
+				and 	self.stat.state	== linuxcnc.RCS_DONE
+			)
+
+
+	def jog_keyboard(self, *arg):
+		self.builder.get_object("jog_dialog").run()
+		self.builder.get_object("jog_dialog").hide()
+		self.jog_release()
+
+
+	def jog_on_key_up(self, w, event):
+		print "Up"
+		key = event.keyval
+		self.jog_release(force=True)
+		return True
+			
+			
+	def jog_on_key_down(self, w, event): 
+		key = event.keyval
+		print key
+		s =   event.string
+		if key == 65362 : 
+			self.jog(None, 1,  1.)
+		if key == 65363 : 
+			self.jog(None, 0,  1.)
+		if key == 65364 : 
+			self.jog(None, 1, -1.)
+		if key == 65361 : 
+			self.jog(None, 0, -1.)
+		if key == 65365 : 
+			self.jog(None, 2,  1.)
+		if key == 65366 : 
+			self.jog(None, 2, -1.)
+			
+		if s in "[{хХ" and s!="" : 
+			self.jog(None, 3, -1.)
+		if s in "]}ъЪ" and s!="" : 
+			self.jog(None, 3, 1.)
+		if s in ",<бБ" and s!="" : 
+			self.jog(None, 4, -1.)
+		if s in ".>юЮ" and s!="" : 
+			self.jog(None, 4, 1.)
+		if key in [65293, 65307, 65421] :
+			self.builder.get_object("jog_dialog").response(0)
+			self.jog_release() 		
+		return True
+			
+
+	def jog_release(self, w=None, a=None, b=None, force=False) :
+		if self.jogging_cont or force :
+			self.jog_stop()
+
 	def jog(self, w, ax, d):
-	
-		if self.busy() :
+		if not self.can_jog() :
 			return
-	
-		inc = self.get_increment() * d
-		speed = self.builder.get_object("jog_speed").get_value() * d		
+		inc = self.get_increment()
+		speed = self.builder.get_object("jog_speed").get_value()/60
 		self.c.mode(linuxcnc.MODE_MANUAL)
+		self.c.wait_complete()		
+		self.set_mode()
 		self.c.wait_complete()
-		print ax
 		if inc>0:
-			self.c.jog(linuxcnc.JOG_INCREMENT, self.is_joint_mode(), ax, speed, inc)
+			self.c.jog(linuxcnc.JOG_INCREMENT, self.is_joint_mode(), ax, speed, inc*d)
 		else:
 			self.message("%s"%speed)
-			self.c.jog(linuxcnc.JOG_CONTINUOUS, self.is_joint_mode(), ax, speed)
+			self.jogging_cont = True
+			self.c.jog(linuxcnc.JOG_CONTINUOUS, self.is_joint_mode(), ax, speed*d)
 	
 	def jog_stop(self, *arg) :	
+		print "JOG STOP"
 		for i in range(5):
-			self.c.jog(linuxcnc.JOG_STOP,i)
+			self.c.jog(linuxcnc.JOG_STOP,self.is_joint_mode(),i)
 			
 	def is_joint_mode(self) :
-		return self.builder.get_object("global").get_active()
+		self.stat.poll()
+		return self.stat.motion_mode != 3
+
 	
-	def local(self, *arg) :
+	def set_mode(self, *arg) :
 		if  self.builder.get_object("global").get_active() :
 			self.message("Локальные координаты")
+			self.c.teleop_enable(0)
 		else :	
 			self.message("Глобальные координаты")
+			self.c.teleop_enable(1)
+			
 	def run_thread(self, *arg) :
 		if self.abort_status == True :
 			self.finish()
@@ -263,6 +352,7 @@ class goniometer(object):
 		
 	def finish(self) :
 		t =  time.time() - self.start_time
+		
 		print "Finished scanning. Done in %.0f:%.0f"%(t/60,t%60)
 		self.builder.get_object("progress-dialog").hide()
  
@@ -284,15 +374,22 @@ class goniometer(object):
 				self.abort()
 			print e[1]
 			self.message(e[1])
+			self.error_watch(self, *arg) # try to get the rest of quenue
 		return True		
 		
 	def on_key_down(self, w, event): 
 		key = event.keyval	
 		if key == 65307 :	
 			self.abort()
+		print key
+				
 
+		
 	def abort(self) :
 		self.c.abort()
+		self.jog_stop()
+		self.stat.poll()
+		
 		self.abort_status = True
 		self.finish()
 		print "Aborting execution!"
