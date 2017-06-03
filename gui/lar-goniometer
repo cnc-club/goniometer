@@ -43,22 +43,33 @@ class goniometer(object):
 		self.MDI_COMPLETE = True
 		self.abort_status = True
 		self.ini_file  = sys.argv[2]
+		
 		print "Using ini file: %s"%self.ini_file			
 		self.ini = linuxcnc.ini(self.ini_file)
 		self.c = linuxcnc.command()
 		self.err = linuxcnc.error_channel()	
-		self.linuxcnc_stat = linuxcnc.stat()
+		self.stat = linuxcnc.stat()
 		self.h_find_pos = [(),()]
 		self.init_glade()		
 		postgui_halfile = self.ini.find("HAL", "POSTGUI_HALFILE")		
 		print "LAR: Loading postgui hal file: %s"%postgui_halfile
+		print (['halcmd', '-i', self.ini_file, "-f", postgui_halfile], subprocess.PIPE, subprocess.PIPE)
 		p = subprocess.Popen(['halcmd', '-i', self.ini_file, "-f", postgui_halfile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		
 		out, err = p.communicate()
 		print "LAR: Postgui load status out: %s err: %s"%(out,err)
 		self.updating_inputs = False
 		self.load_config()
 		self.get_limits()
 		gobject.timeout_add(100, self.error_watch)
+
+	def message(self, s, type="Status") :
+		if type.lower() == "status" :
+			st = self.builder.get_object("statusbar1")
+			context = st.get_context_id("gui")
+			st.pop(context)
+			st.push(context, s)
+			
 
 	def get_limits(self) :
 		self.limits = {}
@@ -105,10 +116,13 @@ class goniometer(object):
 		self.connect_signals()
 
 	def get_increment(self) :
-		for i in range(5):
+		for i in range(6):
 			w = self.builder.get_object("inc%s"%i)
 			if (w.get_active()) :
-				return float(w.get_label())
+				try :
+					return float(w.get_label())
+				except :
+					return -1	
 				
 	
 	def check_coords(self,coord) :
@@ -170,24 +184,59 @@ class goniometer(object):
 		#self.window.connect("destroy",self.quit)
 		self.window.connect("key-press-event", self.on_key_down)
 		self.window.connect("delete-event", self.on_window_destroy)
-		self.builder.get_object("xp").connect("clicked", self.move_btn, 1., 0., 0., 0.)
-		self.builder.get_object("xm").connect("clicked", self.move_btn,-1., 0., 0., 0.)
-		self.builder.get_object("yp").connect("clicked", self.move_btn, 0., 1., 0., 0.)
-		self.builder.get_object("ym").connect("clicked", self.move_btn, 0.,-1., 0., 0.)
-		self.builder.get_object("ap").connect("clicked", self.move_btn, 0., 0., 1., 0.)
-		self.builder.get_object("am").connect("clicked", self.move_btn, 0., 0.,-1., 0.)
-		self.builder.get_object("bp").connect("clicked", self.move_btn, 0., 0., 0., 1.)
-		self.builder.get_object("bm").connect("clicked", self.move_btn, 0., 0., 0.,-1.)
+		self.builder.get_object("global").connect("toggled", self.local)
 		self.builder.get_object("moveback").connect("clicked", self.move_back)
 		self.builder.get_object("start_sphere").connect("clicked", self.scan_sphere)
-		
-		
+
+		self.builder.get_object("xp").connect("clicked", self.jog, 0,  1.)
+		self.builder.get_object("xm").connect("clicked", self.jog, 0, -1.)
+		self.builder.get_object("yp").connect("clicked", self.jog, 1,  1.)
+		self.builder.get_object("ym").connect("clicked", self.jog, 1, -1.)
+		self.builder.get_object("zp").connect("clicked", self.jog, 2,  1.)
+		self.builder.get_object("zm").connect("clicked", self.jog, 2, -1.)
+		self.builder.get_object("ap").connect("clicked", self.jog, 3,  1.)
+		self.builder.get_object("am").connect("clicked", self.jog, 3, -1.)
+		self.builder.get_object("bp").connect("clicked", self.jog, 4,  1.)
+		self.builder.get_object("bm").connect("clicked", self.jog, 4, -1.)
+
+	def busy(self):
+	    self.stat.poll()
+	    return self.stat.task_mode == linuxcnc.MODE_AUTO and self.stat.interp_state != linuxcnc.INTERP_IDLE
+
+	def jog(self, w, ax, d):
+	
+		if self.busy() :
+			return
+	
+		inc = self.get_increment() * d
+		speed = self.builder.get_object("jog_speed").get_value() * d		
+		self.c.mode(linuxcnc.MODE_MANUAL)
+		self.c.wait_complete()
+		print ax
+		if inc>0:
+			self.c.jog(linuxcnc.JOG_INCREMENT, self.is_joint_mode(), ax, speed, inc)
+		else:
+			self.message("%s"%speed)
+			self.c.jog(linuxcnc.JOG_CONTINUOUS, self.is_joint_mode(), ax, speed)
+	
+	def jog_stop(self, *arg) :	
+		for i in range(5):
+			self.c.jog(linuxcnc.JOG_STOP,i)
+			
+	def is_joint_mode(self) :
+		return self.builder.get_object("global").get_active()
+	
+	def local(self, *arg) :
+		if  self.builder.get_object("global").get_active() :
+			self.message("Локальные координаты")
+		else :	
+			self.message("Глобальные координаты")
 	def run_thread(self, *arg) :
 		if self.abort_status == True :
 			self.finish()
 			return False
 			
-		self.linuxcnc_stat.poll()
+		self.stat.poll()
 		if self.MDI_COMPLETE == True :
 			if self.prog_pos >= len(self.prog) :
 				self.finish()
@@ -214,7 +263,7 @@ class goniometer(object):
 		
 	def finish(self) :
 		t =  time.time() - self.start_time
-		print "Finished scanning. Done in %.0f:%.0f"(t/60,t%60)
+		print "Finished scanning. Done in %.0f:%.0f"%(t/60,t%60)
 		self.builder.get_object("progress-dialog").hide()
  
 		
@@ -234,6 +283,7 @@ class goniometer(object):
 			if self.abort_status == False : 
 				self.abort()
 			print e[1]
+			self.message(e[1])
 		return True		
 		
 	def on_key_down(self, w, event): 
