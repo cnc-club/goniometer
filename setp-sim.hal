@@ -25,12 +25,6 @@ setp	stepgen.0.position-scale	-100
 setp	pid.x.error-previous-target 0
 
 
-setp	 hm2_5i25.0.encoder.02.counter-mode		0
-setp	 hm2_5i25.0.encoder.02.filter			1
-setp	 hm2_5i25.0.encoder.02.index-invert		0
-setp	 hm2_5i25.0.encoder.02.index-mask		0
-setp	 hm2_5i25.0.encoder.02.index-mask-invert 0
-setp	 hm2_5i25.0.encoder.02.scale			-200
 
 #*******************
 # AXIS Y
@@ -59,12 +53,6 @@ setp	stepgen.1.position-scale	200
 setp	pid.y.error-previous-target 1
 
 
-setp	 hm2_5i25.0.encoder.01.counter-mode		0
-setp	 hm2_5i25.0.encoder.01.filter			1
-setp	 hm2_5i25.0.encoder.01.index-invert		0
-setp	 hm2_5i25.0.encoder.01.index-mask		0
-setp	 hm2_5i25.0.encoder.01.index-mask-invert 0
-setp	 hm2_5i25.0.encoder.01.scale			200
 
 #*******************
 # AXIS Z
@@ -87,16 +75,10 @@ setp	stepgen.2.dirsetup	35000
 setp	stepgen.2.dirhold	35000
 setp	stepgen.2.steplen	1
 setp	stepgen.2.stepspace	0
-setp	stepgen.2.maxaccel	600
-setp	stepgen.2.maxvel	55
+setp	stepgen.2.maxaccel	400
+setp	stepgen.2.maxvel	50
 setp	stepgen.2.position-scale	400
 
-setp	 hm2_5i25.0.encoder.00.counter-mode			0
-setp	 hm2_5i25.0.encoder.00.filter				1
-setp	 hm2_5i25.0.encoder.00.index-invert			0
-setp	 hm2_5i25.0.encoder.00.index-mask			0
-setp	 hm2_5i25.0.encoder.00.index-mask-invert	0
-setp	 hm2_5i25.0.encoder.00.scale				-200
 
 
 #*******************
@@ -121,16 +103,10 @@ setp	stepgen.3.steplen	1
 setp	stepgen.3.stepspace	0
 setp	stepgen.3.maxaccel	30
 setp	stepgen.3.maxvel	20
-setp	stepgen.3.position-scale -155.555555555
+setp	stepgen.3.position-scale 155.555555555
 setp	pid.a.error-previous-target 0
 
 
-setp	 hm2_5i25.0.encoder.05.counter-mode		0
-setp	 hm2_5i25.0.encoder.05.filter			1
-setp	 hm2_5i25.0.encoder.05.index-invert		0
-setp	 hm2_5i25.0.encoder.05.index-mask		0
-setp	 hm2_5i25.0.encoder.05.index-mask-invert 	0
-setp	 hm2_5i25.0.encoder.05.scale			-277.777777778
 
 
 #*******************
@@ -157,15 +133,6 @@ setp	stepgen.4.maxaccel	30
 setp	stepgen.4.maxvel	20 
 setp	stepgen.4.position-scale 155.555555555
 setp	pid.b.error-previous-target 0
-
-
-setp	 hm2_5i25.0.encoder.04.counter-mode		0
-setp	 hm2_5i25.0.encoder.04.filter			1
-setp	 hm2_5i25.0.encoder.04.index-invert		0
-setp	 hm2_5i25.0.encoder.04.index-mask		0
-setp	 hm2_5i25.0.encoder.04.index-mask-invert 	0
-setp	 hm2_5i25.0.encoder.04.scale			-277.777777778
-
 
 
 

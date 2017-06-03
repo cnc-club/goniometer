@@ -87,8 +87,8 @@ setp	stepgen.2.dirsetup	35000
 setp	stepgen.2.dirhold	35000
 setp	stepgen.2.steplen	1
 setp	stepgen.2.stepspace	0
-setp	stepgen.2.maxaccel	600
-setp	stepgen.2.maxvel	55
+setp	stepgen.2.maxaccel	400
+setp	stepgen.2.maxvel	50
 setp	stepgen.2.position-scale	400
 
 setp	 hm2_5i25.0.encoder.00.counter-mode			0
@@ -112,8 +112,8 @@ setp	pid.a.FF1		0.0
 setp	pid.a.FF2		0.00	
 setp	pid.a.deadband	0.05
 setp	pid.a.maxoutput 0
-setp	pid.a.maxerror	50
-setp	pid.a.maxerrorI	50
+setp	pid.a.maxerror	10
+setp	pid.a.maxerrorI	20
 
 setp	stepgen.3.dirsetup	35000
 setp	stepgen.3.dirhold	35000
@@ -121,7 +121,7 @@ setp	stepgen.3.steplen	1
 setp	stepgen.3.stepspace	0
 setp	stepgen.3.maxaccel	30
 setp	stepgen.3.maxvel	20
-setp	stepgen.3.position-scale -155.555555555
+setp	stepgen.3.position-scale 155.555555555
 setp	pid.a.error-previous-target 0
 
 
