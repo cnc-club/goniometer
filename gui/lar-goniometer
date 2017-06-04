@@ -31,6 +31,32 @@ CFG = "gui/cfg/default.cfg"
 to_rad = pi/180.
 to_grad = 180./pi
 
+class P5():
+	def __init__(self, x=None, y=None, z=None, a=None, b=None) :
+		if type(x) in [list, tuple] :
+			x,y,z,a,b = tuple(x) 
+		self.x = x
+		self.y = y
+		self.z = z
+		self.a = a
+		self.b = b
+
+	def to_list(self) :	
+		return [self.x,self.y,self.z,self.a,self.b]
+		
+	def to_gcode(self) :
+		s = ""
+		if self.x != None :
+			s += " X%0.6f"%self.x
+		if self.y != None :
+			s += " Y%0.6f"%self.y
+		if self.z != None :
+			s += " Z%0.6f"%self.z
+		if self.a != None :
+			s += " A%0.6f"%self.a
+		if self.b != None :
+			s += " B%0.6f"%self.b
+		return s
 class goniometer(object):
 	def __init__(self):
 		self.x = 0
@@ -180,62 +206,101 @@ class goniometer(object):
 		print("xyab>",x,y,a,b)
 		self.update_coord((x,y,z,a,b))
 	
+	
+	
+	def scan_vert(self, w) :
+		self.points = []
+		amax = self.get_p("p0")
+		step = self.get_p("p1")
+		steps = self.get_p("p2")
+		if steps == 0 :
+			if step == 0 :	
+				return 
+			steps = ceil(amax/step)
+		else :
+			step = amax/steps	
+			
+		a = 0	
+		self.points.append(P5(None,None,None,0,a))	
+		for i in range(int(steps)) :
+			a += step
+			if a>amax : 
+				a = amax
+			self.points.append(P5(None,None,None,0,a))	
+			self.points.append(P5(None,None,None,0,-a))	
+		self.scan()
+		
+	def scan_hor(self, w) :
+		self.points = []
+		amax = self.get_p("p3")
+		step = self.get_p("p4")
+		steps = self.get_p("p5")
+		if steps == 0 :
+			if step == 0 :	
+				return 
+			steps = ceil(amax/step)
+		else :
+			step = amax/steps	
+			
+		a = 0	
+		self.points.append(P5(None,None,None,a,0))	
+		for i in range(int(steps)) :
+			a += step
+			if a>amax : 
+				a = amax
+			self.points.append(P5(None,None,None,a,0))	
+			self.points.append(P5(None,None,None,-a,0))	
+		self.scan()	
+		
+	def scan_sphere(self) :
+		return
+	def scan_square(self) :
+		return
+	def scan_star(self) :
+		return
+			
+	def scan_cross(self) :
+		return
+			
+	def sort_points(self) :
+		points = [p.to_list() for p in self.points]
+		points.sort()
+		self.points = [P5(p) for p in points]			
+		
+	def scan(self) :
+		self.sort_points()
+		self.gcode = ""
+		for p in self.points	:
+			self.gcode += "G0 "+p.to_gcode() + "\n"					
+		print self.gcode
+		
+			
 	def connect_signals(self) :
 		#self.window.connect("destroy",self.quit)
 		self.window.connect("key-press-event", self.on_key_down)
 		self.window.connect("delete-event", self.on_window_destroy)
 		self.builder.get_object("global").connect("toggled", self.set_mode)
-		self.builder.get_object("moveback").connect("clicked", self.move_back)
+		self.builder.get_object("inc5").connect("toggled", self.set_inc)
+		self.builder.get_object("start_cross").connect("clicked", self.scan_cross)
+		self.builder.get_object("start_star").connect("clicked", self.scan_star)
 		self.builder.get_object("start_sphere").connect("clicked", self.scan_sphere)
-		self.builder.get_object("jog_keyboard").connect("clicked", self.jog_keyboard)
+		self.builder.get_object("start_square").connect("clicked", self.scan_square)
+		self.builder.get_object("start_vert").connect("clicked", self.scan_vert)
+		self.builder.get_object("start_hor").connect("clicked", self.scan_hor)
 
+		self.builder.get_object("jog_keyboard").connect("clicked", self.jog_keyboard)
 		self.builder.get_object("jog_dialog").connect("key-press-event", self.jog_on_key_down)
 		self.builder.get_object("jog_dialog").connect("key-release-event", self.jog_on_key_up)
-
-
-		self.builder.get_object("xp").connect("pressed", self.jog, 0,  1.)
-		self.builder.get_object("xm").connect("pressed", self.jog, 0, -1.)
-		self.builder.get_object("yp").connect("pressed", self.jog, 1,  1.)
-		self.builder.get_object("ym").connect("pressed", self.jog, 1, -1.)
-		self.builder.get_object("zp").connect("pressed", self.jog, 2,  1.)
-		self.builder.get_object("zm").connect("pressed", self.jog, 2, -1.)
-		self.builder.get_object("ap").connect("pressed", self.jog, 3,  1.)
-		self.builder.get_object("am").connect("pressed", self.jog, 3, -1.)
-		self.builder.get_object("bp").connect("pressed", self.jog, 4,  1.)
-		self.builder.get_object("bm").connect("pressed", self.jog, 4, -1.)
-
-		self.builder.get_object("xp").connect("released", self.jog_release, 0,  1.)
-		self.builder.get_object("xm").connect("released", self.jog_release, 0, -1.)
-		self.builder.get_object("yp").connect("released", self.jog_release, 1,  1.)
-		self.builder.get_object("ym").connect("released", self.jog_release, 1, -1.)
-		self.builder.get_object("zp").connect("released", self.jog_release, 2,  1.)
-		self.builder.get_object("zm").connect("released", self.jog_release, 2, -1.)
-		self.builder.get_object("ap").connect("released", self.jog_release, 3,  1.)
-		self.builder.get_object("am").connect("released", self.jog_release, 3, -1.)
-		self.builder.get_object("bp").connect("released", self.jog_release, 4,  1.)
-		self.builder.get_object("bm").connect("released", self.jog_release, 4, -1.)
-
 		
-
-	def busy(self):
-	    self.stat.poll()
-	    return self.stat.task_mode == linuxcnc.MODE_AUTO and self.stat.interp_state != linuxcnc.INTERP_IDLE
-
-	def can_jog(self) :
-		self.stat.poll()
-		print self.stat.state
-		print		not self.busy() 
-		print	 not self.stat.state == linuxcnc.STATE_ESTOP
-		print		 not self.stat.state == linuxcnc.STATE_OFF
-		print		 	self.stat.state == linuxcnc.STATE_ON
-		print
-		return  (
-				not self.busy() 
-				and not self.stat.task_state == linuxcnc.STATE_ESTOP
-				and not self.stat.task_state == linuxcnc.STATE_OFF
-				and 	self.stat.task_state == linuxcnc.STATE_ON
-				and 	self.stat.state	== linuxcnc.RCS_DONE
-			)
+		
+	def set_inc(self, *arg) :
+			w = self.builder.get_object("inc5")
+			if (w.get_active()) :
+					self.builder.get_object("jog_table").hide()
+					self.builder.get_object("jog_table1").show()
+			else :		
+					self.builder.get_object("jog_table1").hide()
+					self.builder.get_object("jog_table").show()
 
 
 	def jog_keyboard(self, *arg):
@@ -282,31 +347,6 @@ class goniometer(object):
 		return True
 			
 
-	def jog_release(self, w=None, a=None, b=None, force=False) :
-		if self.jogging_cont or force :
-			self.jog_stop()
-
-	def jog(self, w, ax, d):
-		if not self.can_jog() :
-			return
-		inc = self.get_increment()
-		speed = self.builder.get_object("jog_speed").get_value()/60
-		self.c.mode(linuxcnc.MODE_MANUAL)
-		self.c.wait_complete()		
-		self.set_mode()
-		self.c.wait_complete()
-		if inc>0:
-			self.c.jog(linuxcnc.JOG_INCREMENT, self.is_joint_mode(), ax, speed, inc*d)
-		else:
-			self.message("%s"%speed)
-			self.jogging_cont = True
-			self.c.jog(linuxcnc.JOG_CONTINUOUS, self.is_joint_mode(), ax, speed*d)
-	
-	def jog_stop(self, *arg) :	
-		print "JOG STOP"
-		for i in range(5):
-			self.c.jog(linuxcnc.JOG_STOP,self.is_joint_mode(),i)
-			
 	def is_joint_mode(self) :
 		self.stat.poll()
 		return self.stat.motion_mode != 3
@@ -343,13 +383,6 @@ class goniometer(object):
 	def get_coord(self) :
 		return self.x,self.y,self.z,self.a,self.b,
 
-	def move_back(self, w) :
-		if w.get_active() :
-			#move back
-			self.goto(None,x=self.limits["max0"],G53="G53")
-		else :
-			self.update_coord(self.get_coord())
-		
 	def finish(self) :
 		t =  time.time() - self.start_time
 		
@@ -360,8 +393,8 @@ class goniometer(object):
 	def start(self) :
 		self.start_time = time.time()
 		print "Start scanning..." 
-		self.abort_status = False
-		self.prog_pos = 0
+		#self.abort_status = False
+		#self.prog_pos = 0
 		gobject.timeout_add(200, self.run_thread)		
 		responce = self.builder.get_object("progress-dialog").run()
 		self.abort()

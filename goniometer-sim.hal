@@ -8,6 +8,7 @@ loadrt stepgen step_type=0,0,0,0,0 ctrl_type=p,p,p,p,p
 loadrt sum2 count=5
 loadrt logic count=1 personality=261
 
+
 addf stepgen.make-pulses	base-thread
 
 addf stepgen.capture-position	servo-thread

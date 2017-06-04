@@ -8,16 +8,45 @@ net home	<= gui.home_all		=> halui.mode.manual	=> halui.mode.joint		=> halui.hom
 net homed				=> gui.homed
 
 
-net mxp		<= gui.mxp		=> halui.jog.0.plus
-net mxm		<= gui.mxm		=> halui.jog.0.minus
-net myp		<= gui.myp		=> halui.jog.1.plus
-net mym		<= gui.mym		=> halui.jog.1.minus
-net mzp		<= gui.mzp		=> halui.jog.2.plus
-net mzm		<= gui.mzm		=> halui.jog.2.minus
-net map		<= gui.map		=> halui.jog.3.plus
-net mam		<= gui.mam		=> halui.jog.3.minus
-net mbp		<= gui.mbp		=> halui.jog.4.plus
-net mbm		<= gui.mbm		=> halui.jog.4.minus
+
+net inc		<= select8.0.out	=> halui.jog.0.increment => halui.jog.1.increment => halui.jog.2.increment => halui.jog.3.increment => halui.jog.4.increment
+net inc0 	<= gui.inc0	 	=> select8.0.sel0
+net inc1 	<= gui.inc1	 	=> select8.0.sel1
+net inc2	<= gui.inc2	 	=> select8.0.sel2
+net inc3 	<= gui.inc3	 	=> select8.0.sel3
+net inc4 	<= gui.inc4	 	=> select8.0.sel4
+setp select8.0.in0 0.1
+setp select8.0.in1 1
+setp select8.0.in2 5
+setp select8.0.in3 10
+setp select8.0.in4 50
+
+net jspeed	<= gui.jog-speed	=> halui.jog-speed
+
+net xp		<= gui.xp		=> halui.jog.0.increment-plus
+net xm		<= gui.xm		=> halui.jog.0.increment-minus
+net yp		<= gui.yp		=> halui.jog.1.increment-plus
+net ym		<= gui.ym		=> halui.jog.1.increment-minus
+net zp		<= gui.zp		=> halui.jog.2.increment-plus
+net zm		<= gui.zm		=> halui.jog.2.increment-minus
+net ap		<= gui.ap		=> halui.jog.3.increment-plus
+net am		<= gui.am		=> halui.jog.3.increment-minus
+net bp		<= gui.bp		=> halui.jog.4.increment-plus
+net bm		<= gui.bm		=> halui.jog.4.increment-minus
+
+net xp1		<= gui.xp1		=> halui.jog.0.plus
+net xm1		<= gui.xm1		=> halui.jog.0.minus
+net yp1		<= gui.yp1		=> halui.jog.1.plus
+net ym1		<= gui.ym1		=> halui.jog.1.minus
+net zp1		<= gui.zp1		=> halui.jog.2.plus
+net zm1		<= gui.zm1		=> halui.jog.2.minus
+net ap1		<= gui.ap1		=> halui.jog.3.plus
+net am1		<= gui.am1		=> halui.jog.3.minus
+net bp1		<= gui.bp1		=> halui.jog.4.plus
+net bm1		<= gui.bm1		=> halui.jog.4.minus
+
+
+
 
 net jog-speed	<= gui.jog_speed	=> halui.jog-speed
 

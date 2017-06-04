@@ -10,6 +10,7 @@ loadrt pid names=pid.x,pid.y,pid.z,pid.a,pid.b
 loadrt stepgen step_type=0,0,0,0,0 ctrl_type=p,p,p,p,p
 loadrt sum2 count=5
 loadrt logic count=1 personality=261
+loadrt select8
 
 addf parport.0.read	base-thread
 addf stepgen.make-pulses	base-thread
@@ -32,8 +33,8 @@ addf pid.a.do-pid-calcs	servo-thread
 addf pid.b.do-pid-calcs	servo-thread
 addf stepgen.update-freq	servo-thread
 addf hm2_5i25.0.write	servo-thread
-
-addf logic.0 		servo-thread
+addf select8.0 	servo-thread
+addf logic.0 	servo-thread
 
 setp parport.0.reset-time 5000
 setp sum2.0.gain1 -1

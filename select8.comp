@@ -1,0 +1,29 @@
+component select8;
+pin in bit sel0;
+pin in bit sel1;
+pin in bit sel2;
+pin in bit sel3;
+pin in bit sel4;
+pin in bit sel5;
+pin in bit sel6;
+pin in bit sel7;
+pin in float in0;
+pin in float in1;
+pin in float in2;
+pin in float in3;
+pin in float in4;
+pin in float in5;
+pin in float in6;
+pin in float in7;
+pin out float out;
+function _;
+license "GPL"; // indicates GPL v2 or later
+;;
+		if(sel0){out = in0;}
+else 	if(sel1){out = in1;}
+else 	if(sel2){out = in2;}
+else 	if(sel3){out = in3;}
+else 	if(sel4){out = in4;}
+else 	if(sel5){out = in5;}
+else 	if(sel6){out = in6;}
+else 	{out = 0;}
