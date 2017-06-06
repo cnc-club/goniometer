@@ -206,19 +206,26 @@ class goniometer(object):
 		print("xyab>",x,y,a,b)
 		self.update_coord((x,y,z,a,b))
 	
-	
+	def compute(self, amax, step, steps):
+		if steps == 0 :
+			if step == 0 :	
+				return [None,None,None] 
+			steps = ceil(amax/step)
+		else :
+			if steps == 0 :
+				return [None,None,None] 
+			step = amax/steps
+		return amax, step, int(steps)		
+			
 	
 	def scan_vert(self, w) :
 		self.points = []
 		amax = self.get_p("p0")
 		step = self.get_p("p1")
 		steps = self.get_p("p2")
-		if steps == 0 :
-			if step == 0 :	
-				return 
-			steps = ceil(amax/step)
-		else :
-			step = amax/steps	
+		amax, step, steps = self.compute(amax, step, steps)
+		if amax == None : 
+			return
 			
 		a = 0	
 		self.points.append(P5(None,None,None,0,a))	
@@ -235,12 +242,9 @@ class goniometer(object):
 		amax = self.get_p("p3")
 		step = self.get_p("p4")
 		steps = self.get_p("p5")
-		if steps == 0 :
-			if step == 0 :	
-				return 
-			steps = ceil(amax/step)
-		else :
-			step = amax/steps	
+		amax, step, steps = self.compute(amax, step, steps)
+		if amax == None : 
+			return
 			
 		a = 0	
 		self.points.append(P5(None,None,None,a,0))	
@@ -254,8 +258,33 @@ class goniometer(object):
 		
 	def scan_sphere(self) :
 		return
-	def scan_square(self) :
-		return
+		
+	def scan_square(self, arg) :
+		self.points = []
+		amax = self.get_p("p22")
+		step = self.get_p("p23")
+		steps = self.get_p("p24")
+		amax, step, steps = self.compute(amax, step, steps)
+		if amax == None : 
+			return
+			
+		amax1 = self.get_p("p26")
+		step1 = self.get_p("p27")
+		steps1 = self.get_p("p28")
+		amax1, step1, steps1 = self.compute(amax1, step1, steps1)
+		if amax1 == None : 
+			return
+			
+		for i in range(steps) :
+			for j in range(steps1) :		
+				a = i*step
+				a1 = j*step1
+				self.points.append(P5(None, None, None, a, a1))
+				self.points.append(P5(None, None, None, -a, a1))
+				self.points.append(P5(None, None, None, a, -a1))
+				self.points.append(P5(None, None, None, -a, -a1))
+		self.scan()
+			
 	def scan_star(self) :
 		return
 			
@@ -272,8 +301,17 @@ class goniometer(object):
 		self.gcode = ""
 		for p in self.points	:
 			self.gcode += "G0 "+p.to_gcode() + "\n"					
-		print self.gcode
-		
+			self.gcode += "\n"
+		f = open("scan.ngc","w")
+		f.write(self.gcode)
+		f.close()
+		self.c.program_open("foo.ngc")
+		self.c.wait_complete()		
+		self.c.mode(linuxcnc.MODE_AUTO)
+		self.c.wait_complete()		
+		self.c.reset_interpreter()
+		self.c.wait_complete()		
+		self.c.auto(linuxcnc.AUTO_RUN, 0)
 			
 	def connect_signals(self) :
 		#self.window.connect("destroy",self.quit)
