@@ -9,95 +9,92 @@ import time
 import os
 import json
 from tinydb import TinyDB, Query
+import hal
+import linuxcnc
+import ConfigParser
 
 
 PORT = 8181
 HOST = "127.0.0.1"
 db = TinyDB("db.json")
 
+ws = None
+
+
 
 class Handler(tornado.web.RequestHandler):
-    def get(self):
-        self.render("index.html")
+	def get(self):
+		self.render("index.html")
 
 class HTTPHandler(tornado.web.RequestHandler):
-    
-    def get(self):
-        loader = tornado.template.Loader(".")
-        self.write(loader.load("index.html").generate(host=HOST, port=PORT))
+	
+	def get(self):
+		loader = tornado.template.Loader(".")
+		self.write(loader.load("index.html").generate(host=HOST, port=PORT))
 
 
 class WebSocketsHandler(tornado.websocket.WebSocketHandler):
 
-    def open(self):
-        print("socket opened")
+	def open(self):
+		print("socket opened")
+		global ws
+		ws = self
 
-    def on_message(self, message):
-        print("recv: " + str(len(message)) + " symbols")
-        message = json.loads(message)
-        if message["type"] == "temp-parameters":
-            db.insert(message)
-            
-        if message["type"] == "save-parameters":
-            res = db.search(Query().type == "temp-parameters")
-            [i.pop("temp-parameters", None) for i in res]
-            res = {"parametres":res, "save_name":message["save_name"]}
-            db.insert(res)
-    
-        if message["type"] == "save-programm":
-            pass
-        if message["type"] == "get-programm-list":
-            pass
-        if message["type"] == "get-programm":
-            pass
-                  
-    def on_close(self):
-        print("start removing temp")
-        db.remove(Query().type == "temp-parameters")
-        print("socket closed")
-        
-        
+	def on_message(self, message):
+		global lar
+		print("recv: " + str(len(message)) + " symbols")
+		print message, "!@!#!#"
+		message = json.loads(message)
+		print message
+		
+		if "type" in message:
+			if message["type"] == "get-param":
+				lar.load_cfg()
+				ws.write_message(json.dumps({"type":"get-param", "param":lar.param}))
+				
+			if message["type"] == "set-param":
+				for p in message["param"]:
+					lar.param[p] = message["param"][p]
+					lar.save_cfg()
+				  
+	def on_close(self):
+		print("start removing temp")
+		db.remove(Query().type == "temp-parameters")
+		print("socket closed")
+		
+		
+		
+class Lar():
+	def __init__(self):
+		self.config = ConfigParser.ConfigParser()
+		self.load_cfg()
+				
+	def save_cfg(self) :
+		for p in self.param :
+			self.config.set("LAR",p,self.param[p])
+		self.config.write(open('lar.cfg',"w"))
+
+	def load_cfg(self) :
+		self.param = {}
+		self.config.readfp(open('lar.cfg'))
+		for p in self.config.items("LAR") :
+			self.param[p[0]] = p[1]
+
+			
 
 if __name__ == "__main__":
-    
-    settings = {"static_path": os.path.join(os.path.dirname(__file__), "static")}
-    app = tornado.web.Application([
-        (r"/", HTTPHandler),
-        (r"/ws", WebSocketsHandler),
-        (r"/(websocket\.js)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame1\.js)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame2\.js)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame3\.js)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame4\.js)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame5\.js)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame6\.js)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame7\.js)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame8\.js)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame9\.js)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame10\.js)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(form\.css)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_1\.css)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_2\.css)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_3\.css)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_4\.css)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_5\.css)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_6\.css)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_7\.css)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_8\.css)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_9\.css)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_10\.css)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_1\.html)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_2\.html)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_3\.html)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_4\.html)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_5\.html)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_6\.html)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_7\.html)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_8\.html)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_9\.html)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(frame_10\.html)", tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
-        (r"/(stylish-radio-buttons-css-only/css/style\.css)", tornado.web.StaticFileHandler, dict(path=settings["static_path"]))
-         ], **settings)
-    app.listen(PORT)
-    main_loop = tornado.ioloop.IOLoop.instance()
-    main_loop.start()
+	
+	settings = {"static_path": os.path.join(os.path.dirname(__file__), "static")}
+	app = tornado.web.Application([
+		(r"/", HTTPHandler),
+		(r"/ws", WebSocketsHandler),
+		(r"/(websocket\.js)", 	tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
+		(r"/(.*\.html)",	tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
+		(r"/(.*\.css)",		tornado.web.StaticFileHandler, dict(path=settings["static_path"])),
+		(r"/(.*\.js)", 		tornado.web.StaticFileHandler, dict(path=settings["static_path"]))
+		 ], **settings)	
+	lar = Lar()
+	
+	app.listen(PORT)
+	main_loop = tornado.ioloop.IOLoop.instance()
+	main_loop.start()
