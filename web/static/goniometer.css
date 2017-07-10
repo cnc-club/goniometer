@@ -1,0 +1,73 @@
+h1{margin:0px;padding:0px;}
+h2{margin:0px;padding:0px;font-size:1em;}
+ul {list-style:none; margin: 0px; padding:0px;}
+
+ul.increments{
+	list-style:none;
+	width:450px;
+}
+
+ul.increments li{
+	width:150px;
+	height: 30px;
+	float:left;
+}
+
+
+ul.jog{
+	list-style:none;
+	width:450px;
+}
+
+ul.jog li{
+	width:70px;
+	height: 30px;
+	float:left;
+}
+
+ul.jog input {
+	width:100%;
+	height:100%; 
+}
+
+
+
+.led{
+	display: inline-block;
+	width: 20px;
+	height:20px;
+	border-radius: 8px;
+}
+
+.led.on{
+		background: #00ff00;
+		box-shadow: 2px 2px 7px rgba(0,100,0,.5);
+}
+
+.led.off{
+		background: #ff0000;
+		box-shadow: 2px 2px 7px rgba(100,0,0,.5);
+}
+
+
+
+
+div.panel {
+	background: #eee;
+	border-radius: 0px 5px 5px 5px;
+	box-shadow: 2px 2px 7px rgba(0,0,0,.5);
+	padding: 5px;
+	padding-top: 10px;
+	overflow:hidden;
+	display: inline-block;	
+}
+
+.panel.status {
+	width:250px; 
+}
+
+.panel.params{width:400px;}
+dl {overflow: hidden;}
+dt {float: left; width:150px;}
+dd {width:100px;margin-left:150px;}
+dd input {width:100%;}
