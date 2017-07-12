@@ -93,6 +93,7 @@ function parse_data(event){
 function send_pin(){
 	send(get_data());
 }
+
 function send(data){
 	socket.send(JSON.stringify(
 		data

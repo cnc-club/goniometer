@@ -42,8 +42,6 @@ class WebSocketsHandler(tornado.websocket.WebSocketHandler):
 
 	def on_message(self, message):
 		global lar
-		print("recv: " + str(len(message)) + " symbols")
-		print message, "!@!#!#"
 		message = json.loads(message)
 		print message
 		
@@ -55,7 +53,7 @@ class WebSocketsHandler(tornado.websocket.WebSocketHandler):
 			if message["type"] == "set-param":
 				for p in message["param"]:
 					lar.param[p] = message["param"][p]
-					lar.save_cfg()
+				lar.save_cfg()
 				  
 	def on_close(self):
 		print("start removing temp")
