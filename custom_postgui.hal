@@ -4,49 +4,52 @@ net estop	<= gui.estop 		=> halui.estop.activate
 net estop-led	<= gui.estop_led	=> halui.estop.is-activated
 net reset	<= gui.reset 		=> halui.estop.reset
 
-net home	<= gui.home_all		=> halui.mode.manual	=> halui.mode.joint		=> halui.home-all
+net home	<= gui.home_all		=> halui.mode.manual	=> halui.home-all
 net homed				=> gui.homed
 
+net global	<= gui.global		=> halui.mode.joint
+net local	<= gui.local		=> halui.mode.teleop
+net global-led	=> gui.global-led	=> halui.mode.is-joint
+net local-led	=> gui.local-led	=> halui.mode.is-teleop
+
+net inc		<= select8.0.out	=> halui.axis.x.increment 	=> halui.axis.y.increment 	=> halui.axis.z.increment 	=> halui.axis.a.increment 	=> halui.axis.b.increment
+net inc					=> halui.joint.0.increment	=> halui.joint.1.increment	=> halui.joint.2.increment	=> halui.joint.3.increment	=> halui.joint.4.increment
 
 
-net inc		<= select8.0.out	=> halui.jog.0.increment => halui.jog.1.increment => halui.jog.2.increment => halui.jog.3.increment => halui.jog.4.increment
 net inc0 	<= gui.inc0	 	=> select8.0.sel0
 net inc1 	<= gui.inc1	 	=> select8.0.sel1
 net inc2	<= gui.inc2	 	=> select8.0.sel2
 net inc3 	<= gui.inc3	 	=> select8.0.sel3
 net inc4 	<= gui.inc4	 	=> select8.0.sel4
+
 setp select8.0.in0 0.1
 setp select8.0.in1 1
 setp select8.0.in2 5
 setp select8.0.in3 10
 setp select8.0.in4 50
 
-net jspeed	<= gui.jog-speed	=> halui.jog-speed
+net jspeed	<= gui.jog_speed	=> halui.axis.jog-speed			=> halui.joint.jog-speed
 
-net xp		<= gui.xp		=> halui.jog.0.increment-plus
-net xm		<= gui.xm		=> halui.jog.0.increment-minus
-net yp		<= gui.yp		=> halui.jog.1.increment-plus
-net ym		<= gui.ym		=> halui.jog.1.increment-minus
-net zp		<= gui.zp		=> halui.jog.2.increment-plus
-net zm		<= gui.zm		=> halui.jog.2.increment-minus
-net ap		<= gui.ap		=> halui.jog.3.increment-plus
-net am		<= gui.am		=> halui.jog.3.increment-minus
-net bp		<= gui.bp		=> halui.jog.4.increment-plus
-net bm		<= gui.bm		=> halui.jog.4.increment-minus
+net xp		<= gui.xp		=> halui.axis.x.increment-plus 		=> halui.joint.0.increment-plus
+net xm		<= gui.xm		=> halui.axis.x.increment-minus		=> halui.joint.0.increment-minus
+net yp		<= gui.yp		=> halui.axis.y.increment-plus		=> halui.joint.1.increment-plus
+net ym		<= gui.ym		=> halui.axis.y.increment-minus		=> halui.joint.1.increment-minus
+net zp		<= gui.zp		=> halui.axis.z.increment-plus		=> halui.joint.2.increment-plus
+net zm		<= gui.zm		=> halui.axis.z.increment-minus		=> halui.joint.2.increment-minus
+net ap		<= gui.ap		=> halui.axis.a.increment-plus		=> halui.joint.3.increment-plus
+net am		<= gui.am		=> halui.axis.a.increment-minus		=> halui.joint.3.increment-minus
+net bp		<= gui.bp		=> halui.axis.b.increment-plus		=> halui.joint.4.increment-plus
+net bm		<= gui.bm		=> halui.axis.b.increment-minus		=> halui.joint.4.increment-minus
 
-net xp1		<= gui.xp1		=> halui.jog.0.plus
-net xm1		<= gui.xm1		=> halui.jog.0.minus
-net yp1		<= gui.yp1		=> halui.jog.1.plus
-net ym1		<= gui.ym1		=> halui.jog.1.minus
-net zp1		<= gui.zp1		=> halui.jog.2.plus
-net zm1		<= gui.zm1		=> halui.jog.2.minus
-net ap1		<= gui.ap1		=> halui.jog.3.plus
-net am1		<= gui.am1		=> halui.jog.3.minus
-net bp1		<= gui.bp1		=> halui.jog.4.plus
-net bm1		<= gui.bm1		=> halui.jog.4.minus
+net xp1		<= gui.xp1		=> halui.axis.x.plus			=> halui.joint.0.plus
+net xm1		<= gui.xm1		=> halui.axis.x.minus			=> halui.joint.0.minus
+net yp1		<= gui.yp1		=> halui.axis.y.plus			=> halui.joint.1.plus
+net ym1		<= gui.ym1		=> halui.axis.y.minus			=> halui.joint.1.minus
+net zp1		<= gui.zp1		=> halui.axis.z.plus			=> halui.joint.2.plus
+net zm1		<= gui.zm1		=> halui.axis.z.minus			=> halui.joint.2.minus
+net ap1		<= gui.ap1		=> halui.axis.a.plus			=> halui.joint.3.plus
+net am1		<= gui.am1		=> halui.axis.a.minus			=> halui.joint.3.minus
+net bp1		<= gui.bp1		=> halui.axis.b.plus			=> halui.joint.4.plus
+net bm1		<= gui.bm1		=> halui.axis.b.minus			=> halui.joint.4.minus
 
-
-
-
-net jog-speed	<= gui.jog_speed	=> halui.jog-speed
 

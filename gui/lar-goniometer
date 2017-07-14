@@ -301,15 +301,15 @@ class goniometer(object):
 		self.gcode = ""
 		for p in self.points	:
 			self.gcode += "G0 "+p.to_gcode() + "\n"					
-			self.gcode += "\n"
+			self.gcode += "G4 P0.4\n"
+		self.gcode += "M02\n"	
 		f = open("scan.ngc","w")
 		f.write(self.gcode)
 		f.close()
-		self.c.program_open("foo.ngc")
-		self.c.wait_complete()		
-		self.c.mode(linuxcnc.MODE_AUTO)
-		self.c.wait_complete()		
 		self.c.reset_interpreter()
+		self.c.program_open("scan.ngc")
+		self.c.wait_complete()
+		self.c.mode(linuxcnc.MODE_AUTO)
 		self.c.wait_complete()		
 		self.c.auto(linuxcnc.AUTO_RUN, 0)
 			
@@ -317,7 +317,6 @@ class goniometer(object):
 		#self.window.connect("destroy",self.quit)
 		self.window.connect("key-press-event", self.on_key_down)
 		self.window.connect("delete-event", self.on_window_destroy)
-		self.builder.get_object("global").connect("toggled", self.set_mode)
 		self.builder.get_object("inc5").connect("toggled", self.set_inc)
 		self.builder.get_object("start_cross").connect("clicked", self.scan_cross)
 		self.builder.get_object("start_star").connect("clicked", self.scan_star)
@@ -355,33 +354,6 @@ class goniometer(object):
 			
 			
 	def jog_on_key_down(self, w, event): 
-		key = event.keyval
-		print key
-		s =   event.string
-		if key == 65362 : 
-			self.jog(None, 1,  1.)
-		if key == 65363 : 
-			self.jog(None, 0,  1.)
-		if key == 65364 : 
-			self.jog(None, 1, -1.)
-		if key == 65361 : 
-			self.jog(None, 0, -1.)
-		if key == 65365 : 
-			self.jog(None, 2,  1.)
-		if key == 65366 : 
-			self.jog(None, 2, -1.)
-			
-		if s in "[{хХ" and s!="" : 
-			self.jog(None, 3, -1.)
-		if s in "]}ъЪ" and s!="" : 
-			self.jog(None, 3, 1.)
-		if s in ",<бБ" and s!="" : 
-			self.jog(None, 4, -1.)
-		if s in ".>юЮ" and s!="" : 
-			self.jog(None, 4, 1.)
-		if key in [65293, 65307, 65421] :
-			self.builder.get_object("jog_dialog").response(0)
-			self.jog_release() 		
 		return True
 			
 
@@ -390,14 +362,6 @@ class goniometer(object):
 		return self.stat.motion_mode != 3
 
 	
-	def set_mode(self, *arg) :
-		if  self.builder.get_object("global").get_active() :
-			self.message("Локальные координаты")
-			self.c.teleop_enable(0)
-		else :	
-			self.message("Глобальные координаты")
-			self.c.teleop_enable(1)
-			
 	def run_thread(self, *arg) :
 		if self.abort_status == True :
 			self.finish()
@@ -458,9 +422,7 @@ class goniometer(object):
 		
 	def abort(self) :
 		self.c.abort()
-		self.jog_stop()
 		self.stat.poll()
-		
 		self.abort_status = True
 		self.finish()
 		print "Aborting execution!"
