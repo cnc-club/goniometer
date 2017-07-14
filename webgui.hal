@@ -1,0 +1,51 @@
+loadusr -Wn web ./web.sh
+setp halui.axis.jog-deadband 0.05
+setp halui.joint.jog-deadband 0.05
+
+net on		<= web.on 		=> halui.machine.on
+net is-on	<= web.is-on 		=> halui.machine.is-on
+net estop	<= web.estop 		=> halui.estop.activate
+net estop-led	<= web.estop-led	=> halui.estop.is-activated
+net reset	<= web.reset 		=> halui.estop.reset
+
+net home	<= web.home		=> halui.mode.manual	=> halui.home-all
+net homed				=> web.homed
+
+net global	<= web.global		=> halui.mode.joint
+net local	<= web.local		=> halui.mode.teleop
+net global-led	=> web.global-led	=> halui.mode.is-joint
+net local-led	=> web.local-led	=> halui.mode.is-teleop
+
+net inc		<= web.increment	=> halui.axis.x.increment 	=> halui.axis.y.increment 	=> halui.axis.z.increment 	=> halui.axis.a.increment 	=> halui.axis.b.increment
+net inc					=> halui.joint.0.increment	=> halui.joint.1.increment	=> halui.joint.2.increment	=> halui.joint.3.increment	=> halui.joint.4.increment
+
+net jspeed	<= web.jog-speed	=> halui.axis.jog-speed			=> halui.joint.jog-speed
+
+net xp		<= web.xp		=> halui.axis.x.increment-plus 		=> halui.joint.0.increment-plus
+net xm		<= web.xm		=> halui.axis.x.increment-minus		=> halui.joint.0.increment-minus
+net yp		<= web.yp		=> halui.axis.y.increment-plus		=> halui.joint.1.increment-plus
+net ym		<= web.ym		=> halui.axis.y.increment-minus		=> halui.joint.1.increment-minus
+net zp		<= web.zp		=> halui.axis.z.increment-plus		=> halui.joint.2.increment-plus
+net zm		<= web.zm		=> halui.axis.z.increment-minus		=> halui.joint.2.increment-minus
+net ap		<= web.ap		=> halui.axis.a.increment-plus		=> halui.joint.3.increment-plus
+net am		<= web.am		=> halui.axis.a.increment-minus		=> halui.joint.3.increment-minus
+net bp		<= web.bp		=> halui.axis.b.increment-plus		=> halui.joint.4.increment-plus
+net bm		<= web.bm		=> halui.axis.b.increment-minus		=> halui.joint.4.increment-minus
+
+net xp1		<= web.xpc		=> halui.axis.x.plus			=> halui.joint.0.plus
+net xm1		<= web.xmc		=> halui.axis.x.minus			=> halui.joint.0.minus
+net yp1		<= web.ypc		=> halui.axis.y.plus			=> halui.joint.1.plus
+net ym1		<= web.ymc		=> halui.axis.y.minus			=> halui.joint.1.minus
+net zp1		<= web.zpc		=> halui.axis.z.plus			=> halui.joint.2.plus
+net zm1		<= web.zmc		=> halui.axis.z.minus			=> halui.joint.2.minus
+net ap1		<= web.apc		=> halui.axis.a.plus			=> halui.joint.3.plus
+net am1		<= web.amc		=> halui.axis.a.minus			=> halui.joint.3.minus
+net bp1		<= web.bpc		=> halui.axis.b.plus			=> halui.joint.4.plus
+net bm1		<= web.bmc		=> halui.axis.b.minus			=> halui.joint.4.minus
+
+net xpos	=> web.xpos		<= joint.0.pos-fb
+net ypos	=> web.ypos		<= joint.1.pos-fb
+net zpos	=> web.zpos		<= joint.2.pos-fb
+net apos	=> web.apos		<= joint.3.pos-fb
+net bpos	=> web.bpos		<= joint.4.pos-fb
+

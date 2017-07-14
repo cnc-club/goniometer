@@ -1,4 +1,4 @@
-	/********************************************************************
+/********************************************************************
 * Description: 5axiskins.c
 *   kinematics for XYZBC 5 axis bridge mill
 *
@@ -30,6 +30,12 @@ struct haldata {
 #define JOINT_2 2
 #define JOINT_A 3
 #define JOINT_B 4
+#define JOINT_C 5
+#define JOINT_U 6
+#define JOINT_V 7
+#define JOINT_W 8
+
+
 
 int kinematicsForward(const double *joints,
 			  EmcPose * pos,
@@ -59,7 +65,7 @@ int kinematicsForward(const double *joints,
 	xl = y1;
 	yl = z1;
 	zl = x1;
-	pos->tran.x = xl;
+	pos->tran.x = xl + joints[JOINT_W];
 	pos->tran.y = yl;
 	pos->tran.z = zl;
 	pos->a      = joints[JOINT_A];
@@ -77,7 +83,7 @@ int kinematicsInverse(const EmcPose * pos,
 	a = d2r(pos->a);
 	b = d2r(pos->b);	
 	//xl,yl,h,a,b -> x,y,z,a,b
-	x0 = pos->tran.z;
+	x0 = pos->tran.z+pos->w;
 	y0 = pos->tran.x;
 	z0 = pos->tran.y;
 	
@@ -96,6 +102,7 @@ int kinematicsInverse(const EmcPose * pos,
 	joints[JOINT_2] = z2;
 	joints[JOINT_A] = pos->a;
 	joints[JOINT_B] = pos->b;
+	joints[JOINT_W] = pos->w;
 
 	return 0;
 }

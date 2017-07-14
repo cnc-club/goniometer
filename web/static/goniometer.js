@@ -30,21 +30,19 @@ function set_param(param){
 
 }
 
-function get_data()
+function get_pin()
 {
 	hal = {}
 	$(".pin-out").each(function(){
-		//console.log(this);
-		{
-		if (this.type=="radio")
+		
+		if (this.type=="radio"){
 			hal[pin_name(this)] = this.checked;
 		}
-		if (this.type=="button")
+		else if (this.type=="button")
 		{	
-		//	console.log(this)
 			hal[pin_name(this)] = $(this).attr("active")=="true";
 		}
-		if (this.type=="text")
+		else 
 		{	
 			hal[pin_name(this)] = this.value;
 		}
@@ -55,43 +53,48 @@ function get_data()
 	
 }
 
-function set_data(hal)
+function set_pin(hal)
 {
 	for (name in hal)
 	{
-		console.log(".pin-in." + name);
-		
 		$(".pin-in." + name).each(function(){
-			console.log(this.classList);
-			if ( this.classList.contains("led")>=0) {
+			if ( this.classList.contains("led")) {
 				this.classList.remove("on");
 				this.classList.remove("off");
 				$(this).addClass((hal[name]?"on":"off"));
 			}
 			else if (this.tagName == "SPAN") 
-			{$(this).text(hal[name]);} 
+				{
+					$(this).text(hal[name].toFixed(2));
+				} 
 		});
 	}
 }
 
 
-//set_data({"xpos":1123, "ypos":"13.2"});
+//set_pin({"xpos":1123, "ypos":"13.2"});
 
 
 function parse_data(event){
-		data = JSON.parse(event.data)
+	data = JSON.parse(event.data)
 	if ("type" in data){
 		if (data["type"] == "get-param")
 		{
 			set_param(data["param"]);
 		}
+		if (data["type"] == "pin")
+		{
+			set_pin(data["pin"]);
+		}
+		
 	}
 }
 
 
 
 function send_pin(){
-	send(get_data());
+	message= {"type": "pin", "pin": get_pin()};
+	send(message);
 }
 
 function send(data){
@@ -100,6 +103,36 @@ function send(data){
 	));
 }
 
+
+
+function init_increments(){
+	$("input.inc").change(
+		function(){
+			v = $("input.inc:checked").val();
+			$("input.increment").val(v);
+			if (v == "0"){
+				$(".jog .pin-out").each(function() {
+					c = $(this).attr("class");
+					if (c.slice(-1)!="c")
+					{
+						$(this).attr("class", c+"c");
+					}
+				})
+			}
+				
+			else {
+				$(".jog .pin-out").each(function() {
+					c = $(this).attr("class");
+					if (c.slice(-1)=="c")
+						{$(this).attr("class", c.slice(0, -1));}
+					})
+	
+			}
+			
+		}
+	);
+
+}
 
 function init() {
 	host = location.hostname;
@@ -114,12 +147,27 @@ function init() {
 	$("input:button").mousedown(function(){$(this).attr("active",true); send_pin();} );
 	$("input:button").mouseup(function(){$(this).attr("active",false);  send_pin();} );
 	$("input:button").mouseleave(function(){$(this).attr("active",false);  send_pin();} );
+	$("body").keydown(0, function(a){
+		k = a.keyCode;
+		if (k==27) {
+			$(".pin-out.estop").attr("active",true);}
+		}
+	);
+	$("body").keyup(0, function(a){
+		k = a.keyCode;
+		if (k==27) {
+			$(".pin-out.estop").attr("active",false);}
+		}
+	);
+	
+	
+	
 	$("input.param").change(function(){
 		message= {"type": "set-param", "param": get_param()};
 		send(message);
 		});
-	
 	codes = {
+			221:"bp",
 			38: "yp",
 			40: "ym",
 			39: "xp",
@@ -133,22 +181,31 @@ function init() {
 		}
 	
 	$(".keyboard-jog").keydown(0,function(a){
+		
 		k = a.keyCode;
+		if (49<=k<=54)
+		{
+			$(".inc-"+k).click();
+		}		
 		if (k in codes)
 		{$("ul.jog input."+codes[k]).attr("active",true);}			
+		{$("ul.jog input."+codes[k]+"c").attr("active",true);}			
 		send_pin();			
+		if (k in codes){a.preventDefault();}
 	});
 	$(".keyboard-jog").keyup(0,function(a){
 		k = a.keyCode;
 		if (k in codes)
 		{$("ul.jog input."+codes[k]).attr("active",false);}			
-		send_pin();			
+		{$("ul.jog input."+codes[k]+"c").attr("active",false);}			
+		send_pin();
+		if (k in codes){a.preventDefault();}					
 	});
 	$(".keyboard-jog").focusout(function(){
 		$("ul.jog input:button").each( function() {$(this).attr("active",false);}  );
 		send_pin();
 	});	
-
+	init_increments()
 }
 
 

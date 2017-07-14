@@ -8,20 +8,17 @@ import tornado.gen
 import time
 import os
 import json
-from tinydb import TinyDB, Query
 import hal
 import linuxcnc
 import ConfigParser
-
+import sys
 
 PORT = 8181
 HOST = "127.0.0.1"
-db = TinyDB("db.json")
+
 
 ws = None
-
-
-
+		
 class Handler(tornado.web.RequestHandler):
 	def get(self):
 		self.render("index.html")
@@ -34,7 +31,7 @@ class HTTPHandler(tornado.web.RequestHandler):
 
 
 class WebSocketsHandler(tornado.websocket.WebSocketHandler):
-
+	counter = 0
 	def open(self):
 		print("socket opened")
 		global ws
@@ -43,7 +40,10 @@ class WebSocketsHandler(tornado.websocket.WebSocketHandler):
 	def on_message(self, message):
 		global lar
 		message = json.loads(message)
-		print message
+		self.counter += 1
+		if self.counter%10 == 0:
+			print ".",
+			sys.stdout.flush()
 		
 		if "type" in message:
 			if message["type"] == "get-param":
@@ -54,10 +54,22 @@ class WebSocketsHandler(tornado.websocket.WebSocketHandler):
 				for p in message["param"]:
 					lar.param[p] = message["param"][p]
 				lar.save_cfg()
+				
+			if message["type"] == "pin":
+				pins = message["pin"]
+				for p in pins :
+					if p in lar.bit_out or p in lar.float_out :
+						lar.h[p] = pins[p]
+					else :
+						print "warning unknown pin %s"%p
+				pins = {}
+				for p in lar.float_in+lar.bit_in :
+					pins[p] = lar.h[p]
+				message = {"type":"pin", "pin":pins}	
+				ws.write_message(json.dumps(message))									
+				
 				  
 	def on_close(self):
-		print("start removing temp")
-		db.remove(Query().type == "temp-parameters")
 		print("socket closed")
 		
 		
@@ -66,6 +78,27 @@ class Lar():
 	def __init__(self):
 		self.config = ConfigParser.ConfigParser()
 		self.load_cfg()
+		
+		self.h = hal.component("web")
+		
+		self.bit_in = ["homed", "is-on", "estop-led", "global-led", "local-led", ]
+		self.bit_out = [
+				"reset", "estop", "home", "on", "global", "local", 
+				"xp", "xm", "yp", "ym", "zp", "zm", "ap", "am", "bp", "bm", 		
+				"xpc", "xmc", "ypc", "ymc", "zpc", "zmc", "apc", "amc", "bpc", "bmc", 		
+				]
+		self.float_out = [ "increment", "jog-speed", ]
+		self.float_in  = [ "xpos", "ypos", "zpos", "apos", "bpos", ]
+		for p in self.bit_in :
+			self.h.newpin(p, hal.HAL_BIT, hal.HAL_IN)
+		for p in self.bit_out :
+			self.h.newpin(p, hal.HAL_BIT, hal.HAL_OUT)
+		for p in self.float_in :
+			self.h.newpin(p, hal.HAL_FLOAT, hal.HAL_IN)
+		for p in self.float_out :
+			self.h.newpin(p, hal.HAL_FLOAT, hal.HAL_OUT)
+		self.h.ready()
+
 				
 	def save_cfg(self) :
 		for p in self.param :

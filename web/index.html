@@ -12,8 +12,8 @@
 <div class="panel status">
 	<h1>Статус</h1>
 	<ul class="status">
-		<li><span class="pin-in led on estop"></span> АВОСТ <input type="button" class="pin-out estop-reset" value="Сброс">
-		<li><span class="pin-in led off homed"></span> <input type="button" class="pin-out home" value="Вкл">
+		<li><span class="pin-in led on estop"></span><input type="button" class="pin-out estop" value=" АВОСТ"> <input type="button" class="pin-out reset" value="Сброс">
+		<li><span class="pin-in led off is-on"></span> <input type="button" class="pin-out on" value="Вкл">
 		<li><span class="pin-in led off homed"></span> <input type="button" class="pin-out home" value="Поиск нулей">
 		
 	</ul>
@@ -31,6 +31,17 @@
 </ul>
 </div>
 
+<div class="panel">
+	<h1>Управление</h1>
+		<div>
+			<input type="button" class="pin-out global" value="Глобальные координаты">
+			<span class="pin-in led on global-led">
+			
+		</div>	
+		<div>		
+			<input type="button" class="pin-out local" value="Локальные координаты">
+			<span class="pin-in led on local-led">
+		</div>
 
 
 <div class="panel">
@@ -61,20 +72,18 @@
 	<div class="panel">
 		<h2>Инкременты</h2>
 		<ul class="increments">
-			<li><input type="radio" name="increment" class="pin-out pin-0" checked> 0.1 
-			<li><input type="radio" name="increment" class="pin-out pin-1"> 1
-			<li><input type="radio" name="increment" class="pin-out pin-2"> 5 
-			<li><input type="radio" name="increment" class="pin-out pin-3"> 10
-			<li><input type="radio" name="increment" class="pin-out pin-4"> 50
-			<li><input type="radio" name="increment" class="pin-out pin-5"> inf
-
+			<li><input type="radio" name="increment" class="inc inc-49" value="0.1" checked> 0.1 
+			<li><input type="radio" name="increment" class="inc inc-50" value="1"> 1
+			<li><input type="radio" name="increment" class="inc inc-51" value="5"> 5 
+			<li><input type="radio" name="increment" class="inc inc-52" value="10"> 10
+			<li><input type="radio" name="increment" class="inc inc-53" value="50"> 50
+			<li><input type="radio" name="increment" class="inc inc-54" value="0"> ~~~
 		</ul>
+		<input type="hidden" class="pin-out increment" value="0">
+		
 		Скорость <input type="number" step="100" value="2500" min="0" max="4000" class="pin-out pin-float jog-speed">
 	</div>
 </div>
-
-	
-	
 
 
 
@@ -83,11 +92,11 @@
 	<h1>Выбор инструмента</h1>
 	<p>Сейчас активирован:<span class="pin-in tool"></span></p>
 	<ul class="increments">
-		<li><input type="button" class="pin-out tool-1" value="1"> 
-		<li><input type="button" class="pin-out tool-2" value="2"> 
-		<li><input type="button" class="pin-out tool-3" value="3"> 
-		<li><input type="button" class="pin-out tool-4" value="4"> 
-		<li><input type="button" class="pin-out tool-5" value="5"> 
+		<li><input type="button" class="tool-1" value="1"> 
+		<li><input type="button" class="tool-2" value="2"> 
+		<li><input type="button" class="tool-3" value="3"> 
+		<li><input type="button" class="tool-4" value="4"> 
+		<li><input type="button" class="tool-5" value="5"> 
 	</ul>
 </div>
 
@@ -158,6 +167,5 @@
 
 <span class="pin-in">
 
-<script>get_data();</script>
 </body>
 </html>
