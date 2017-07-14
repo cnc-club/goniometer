@@ -1,0 +1,163 @@
+<html lang="ru">
+<head>
+<link href="goniometer.css" type="text/css" rel="stylesheet">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script language="javascript" src="jquery.min.js"></script>
+<script language="javascript" src="goniometer.js"></script>
+</head>
+
+
+<body>
+
+<div class="panel status">
+	<h1>Статус</h1>
+	<ul class="status">
+		<li><span class="pin-in led on estop"></span> АВОСТ <input type="button" class="pin-out estop-reset" value="Сброс">
+		<li><span class="pin-in led off homed"></span> <input type="button" class="pin-out home" value="Вкл">
+		<li><span class="pin-in led off homed"></span> <input type="button" class="pin-out home" value="Поиск нулей">
+		
+	</ul>
+</div>
+
+
+<div class="panel">
+<h1>Координаты</h1>
+<ul>
+	<li>X<span class="pin-in pin-float xpos">0</span>
+	<li>Y<span class="pin-in pin-float ypos">0</span>
+	<li>Z<span class="pin-in pin-float zpos">0</span>
+	<li>A<span class="pin-in pin-float apos">0</span>
+	<li>B<span class="pin-in pin-float bpos">0</span>
+</ul>
+</div>
+
+
+
+<div class="panel">
+	<h1>JOG</h1>
+	<ul class="jog">
+		<li><input type="button" class="pin-out zp" value="Z+">
+		<li><input type="button" class="pin-out yp" value="Y+">
+		<li> &nbsp;
+		<li> &nbsp;
+		<li><input type="button" class="pin-out bp" value="B+">
+		<li> &nbsp;
+		<li><input type="button" class="pin-out xm" value="X-">
+		<li> &nbsp;
+		<li><input type="button" class="pin-out xp" value="X+">
+		<li><input type="button" class="pin-out am" value="A-">
+		<li> &nbsp;
+		<li><input type="button" class="pin-out ap" value="A+">
+		<li><input type="button" class="pin-out zm" value="Z-">
+		<li><input type="button" class="pin-out ym" value="Y-">
+		<li> &nbsp;
+		<li> &nbsp;
+		<li><input type="button" class="pin-out bm" value="B-">
+		<li> &nbsp;
+	</ul>	
+	
+	<input type="button" class="keyboard-jog" value="Управление от клавиатуры"> 
+	
+	<div class="panel">
+		<h2>Инкременты</h2>
+		<ul class="increments">
+			<li><input type="radio" name="increment" class="pin-out pin-0" checked> 0.1 
+			<li><input type="radio" name="increment" class="pin-out pin-1"> 1
+			<li><input type="radio" name="increment" class="pin-out pin-2"> 5 
+			<li><input type="radio" name="increment" class="pin-out pin-3"> 10
+			<li><input type="radio" name="increment" class="pin-out pin-4"> 50
+			<li><input type="radio" name="increment" class="pin-out pin-5"> inf
+
+		</ul>
+		Скорость <input type="number" step="100" value="2500" min="0" max="4000" class="pin-out pin-float jog-speed">
+	</div>
+</div>
+
+	
+	
+
+
+
+
+<div class="panel">
+	<h1>Выбор инструмента</h1>
+	<p>Сейчас активирован:<span class="pin-in tool"></span></p>
+	<ul class="increments">
+		<li><input type="button" class="pin-out tool-1" value="1"> 
+		<li><input type="button" class="pin-out tool-2" value="2"> 
+		<li><input type="button" class="pin-out tool-3" value="3"> 
+		<li><input type="button" class="pin-out tool-4" value="4"> 
+		<li><input type="button" class="pin-out tool-5" value="5"> 
+	</ul>
+</div>
+
+<div class="panel params">
+	<h1>Параметры</h1>
+	<p>Сейчас активирован:<span class="pin-in tool"></span></p>
+
+	<div class="panel">
+		<h2>Инсрумент 1</h2>
+		<dl class="tool1">
+				<dt>Название<dd>	<input class="param tool1-name" >
+				<dt>X корректор<dd>	<input type="number" class="param tool1-x" >
+				<dt>Y корректор<dd>	<input type="number" class="param tool1-y" >
+				<dt>Z корректор<dd>	<input type="number" class="param tool1-z" >
+				<dt>Фокус<dd>		<input type="number" class="param tool1-f" >
+			
+		</dl>
+	</div>
+	<div class="panel">
+		<h2>Инсрумент 2</h2>
+		<dl class="tool2">
+				<dt>Название<dd>	<input class="param tool2-name" >
+				<dt>X корректор<dd>	<input type="number" class="param tool2-x" >
+				<dt>Y корректор<dd>	<input type="number" class="param tool2-y" >
+				<dt>Z корректор<dd>	<input type="number" class="param tool2-z" >
+				<dt>Фокус<dd>		<input type="number" class="param tool2-f" >
+		</dl>
+	</div>
+	<div class="panel">
+		<h2>Инсрумент 3</h2>
+		<dl class="tool3">
+				<dt>Название<dd>	<input class="param tool2-name" >
+				<dt>X корректор<dd>	<input type="number" class="param tool2-x" >
+				<dt>Y корректор<dd>	<input type="number" class="param tool2-y" >
+				<dt>Z корректор<dd>	<input type="number" class="param tool2-z" >
+				<dt>Фокус<dd>		<input type="number" class="param tool2-f" >
+		</dl>
+	</div>
+	<div class="panel">
+		<h2>Инсрумент 4</h2>
+		<dl class="tool4">
+				<dt>Название<dd>	<input class="param tool2-name" >
+				<dt>X корректор<dd>	<input type="number" class="param tool2-x" >
+				<dt>Y корректор<dd>	<input type="number" class="param tool2-y" >
+				<dt>Z корректор<dd>	<input type="number" class="param tool2-z" >
+				<dt>Фокус<dd>		<input type="number" class="param tool2-f" >
+		</dl>
+	</div>
+	<div class="panel">
+		<h2>Инсрумент 5</h2>
+		<dl class="tool5">
+				<dt>Название<dd>	<input class="param tool2-name" >
+				<dt>X корректор<dd>	<input type="number" class="param tool2-x" >
+				<dt>Y корректор<dd>	<input type="number" class="param tool2-y" >
+				<dt>Z корректор<dd>	<input type="number" class="param tool2-z" >
+				<dt>Фокус<dd>		<input type="number" class="param tool2-f" >
+
+		</dl>
+	</div>
+</div>
+
+
+
+
+<div class="panel status">
+	Status <span class="status"></span>
+</div>
+
+<span class="pin-in">
+
+<script>get_data();</script>
+</body>
+</html>

@@ -57,6 +57,7 @@ class P5():
 		if self.b != None :
 			s += " B%0.6f"%self.b
 		return s
+		
 class goniometer(object):
 	def __init__(self):
 		self.x = 0
