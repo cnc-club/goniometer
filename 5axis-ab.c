@@ -46,7 +46,7 @@ int kinematicsForward(const double *joints,
 	//fwd
 	//x,y,z,a,b -> xl,yl,zl(h),a,b
 	// rotate along -A 
-	x = joints[JOINT_0] - *(haldata->r);
+	x = joints[JOINT_0];
 	y = joints[JOINT_1];
 	z = joints[JOINT_2];
 	a = d2r(joints[JOINT_A]);
@@ -65,12 +65,16 @@ int kinematicsForward(const double *joints,
 	xl = y1;
 	yl = z1;
 	zl = x1;
-	pos->tran.x = xl + joints[JOINT_W];
-	pos->tran.y = yl;
-	pos->tran.z = zl;
+	pos->tran.x = xl - joints[JOINT_W];
+	pos->tran.y = yl - joints[JOINT_V];
+	pos->tran.z = zl - joints[JOINT_U];
 	pos->a      = joints[JOINT_A];
 	pos->b      = joints[JOINT_B];
 
+	pos->u = 0;	
+	pos->v = 0;	
+	pos->w = 0;	
+	
 	return 0;
 }
 
@@ -83,7 +87,7 @@ int kinematicsInverse(const EmcPose * pos,
 	a = d2r(pos->a);
 	b = d2r(pos->b);	
 	//xl,yl,h,a,b -> x,y,z,a,b
-	x0 = pos->tran.z+pos->w;
+	x0 = pos->tran.z;
 	y0 = pos->tran.x;
 	z0 = pos->tran.y;
 	
@@ -97,12 +101,14 @@ int kinematicsInverse(const EmcPose * pos,
 	y2 = x1*sin(a) + y1*cos(a);
 	z2 = z1;
 
-	joints[JOINT_0] = x2 + *(haldata->r);
-	joints[JOINT_1] = y2;
-	joints[JOINT_2] = z2;
+	joints[JOINT_0] = x2 + pos->w;
+	joints[JOINT_1] = y2 + pos->v;
+	joints[JOINT_2] = z2 + pos->u;
 	joints[JOINT_A] = pos->a;
 	joints[JOINT_B] = pos->b;
-	joints[JOINT_W] = pos->w;
+	joints[JOINT_U] = 0;
+	joints[JOINT_V] = 0;
+	joints[JOINT_W] = 0;
 
 	return 0;
 }

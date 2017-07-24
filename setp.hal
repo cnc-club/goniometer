@@ -4,7 +4,7 @@
 # AXIS X
 #*******************
 
-setp	pid.x.Pgain		0
+setp	pid.x.Pgain		0.2
 setp	pid.x.Igain		7
 setp	pid.x.Dgain		0.0
 setp	pid.x.bias		0
@@ -12,8 +12,8 @@ setp	pid.x.FF0		1
 setp	pid.x.FF1		0.0
 setp	pid.x.FF2		0.00
 setp	pid.x.deadband	0.01
-setp	pid.x.maxerror	10
-setp	pid.x.maxerrorI	100
+setp	pid.x.maxerror	1
+setp	pid.x.maxerrorI	10
 
 setp	stepgen.0.dirsetup	35000
 setp	stepgen.0.dirhold	35000

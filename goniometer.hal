@@ -255,6 +255,9 @@ net homed4 	<= joint.4.homed		=> logic.0.in-04
 net homed 	<= logic.0.and
 
 
+net tool-ch	<= iocontrol.0.tool-change	=> iocontrol.0.tool-changed
+net tool-pre	<= iocontrol.0.tool-prepare	=> iocontrol.0.tool-prepared
+
 #net  estop-out <= iocontrol.0.user-enable-out
 net  estop-out => iocontrol.0.emc-enable-in
 net  estop-out <= parport.0.pin-13-in-not
