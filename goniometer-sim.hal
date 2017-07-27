@@ -110,10 +110,10 @@ net z-err	=>  pid.z.error
 net z-pos-fb-l	<=  stepgen.2.position-fb =>  sum2.2.in1
 net z-output	=>  sum2.2.in0
 net z-s-cmd	<=  sum2.2.out
-net z-pos-cmd   <=  joint.2.motor-pos-cmd
+net z-pos-cmd   <=  joint.2.motor-pos-cmd     => joint.2.motor-pos-fb
 net z-vel-cmd   <=  joint.2.vel-cmd
 net z-s-cmd	=>  stepgen.2.position-cmd
-net z-pos-fb    => joint.2.motor-pos-fb
+
 net z-enable    <= joint.2.amp-enable-out
 net z-enable	=> stepgen.2.enable
 net z-step	<= stepgen.2.step
@@ -121,7 +121,6 @@ net z-dir	<= stepgen.2.dir
 net z-pos-cmd   <= joint.2.motor-pos-cmd
 
 
-net z-pos-fb	=>  joint.2.motor-pos-fb
 
 net z-home	=>  joint.2.home-sw-in
 net z-neg-limit	=>  joint.2.neg-lim-sw-in
