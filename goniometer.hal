@@ -11,6 +11,9 @@ loadrt stepgen step_type=0,0,0,0,0 ctrl_type=p,p,p,p,p
 loadrt sum2 count=5
 loadrt logic count=1 personality=261
 loadrt select8
+loadrt cmdlim count=5
+
+
 
 addf parport.0.read	base-thread
 addf stepgen.make-pulses	base-thread
@@ -21,16 +24,21 @@ addf hm2_5i25.0.read	servo-thread
 addf stepgen.capture-position	servo-thread
 addf motion-command-handler	servo-thread
 addf motion-controller	servo-thread
-addf sum2.0		servo-thread
-addf sum2.1		servo-thread
-addf sum2.2		servo-thread
-addf sum2.3		servo-thread
-addf sum2.4		servo-thread
 addf pid.x.do-pid-calcs	servo-thread
 addf pid.y.do-pid-calcs	servo-thread
 addf pid.z.do-pid-calcs	servo-thread
 addf pid.a.do-pid-calcs	servo-thread
 addf pid.b.do-pid-calcs	servo-thread
+addf sum2.0		servo-thread
+addf sum2.1		servo-thread
+addf sum2.2		servo-thread
+addf sum2.3		servo-thread
+addf sum2.4		servo-thread
+addf cmdlim.0 	servo-thread
+addf cmdlim.1 	servo-thread
+addf cmdlim.2 	servo-thread
+addf cmdlim.3 	servo-thread
+addf cmdlim.4 	servo-thread
 addf stepgen.update-freq	servo-thread
 addf hm2_5i25.0.write	servo-thread
 addf select8.0 	servo-thread
@@ -75,29 +83,29 @@ net  b-dir	=> parport.0.pin-17-out
 #*******************
 net x-index-enable  <=> pid.x.index-enable
 setp  pid.x.enable 1
+net x-pos-cmd   <=  joint.0.motor-pos-cmd
+net x-vel-cmd   <=  joint.0.vel-cmd
+net x-pos-fb	<=  hm2_5i25.0.encoder.02.position
+net x-pos-latch	<=  hm2_5i25.0.encoder.02.position-latched
+
+
 net x-pos-cmd	=>  pid.x.command
 net x-vel-cmd	=>  pid.x.command-deriv
 net x-pos-fb	=>  pid.x.feedback
-net x-output	=>  pid.x.output
-net x-err	=>  pid.x.error
+net x-pid		=>  pid.x.output
 
-net x-pos-fb-l	<=  hm2_5i25.0.encoder.02.position-latched =>  sum2.0.in1
-net x-output	=>  sum2.0.in0
-net x-s-cmd	<=  sum2.0.out
-net x-pos-cmd   <=  joint.0.motor-pos-cmd
-net x-vel-cmd   <=  joint.0.vel-cmd
-net x-s-cmd	=>  stepgen.0.position-cmd
-net x-pos-fb    =>  joint.0.motor-pos-fb
+net x-pid		=> cmdlim.0.pid
+net x-pos-latch	=> cmdlim.0.latch
+net x-stepgen	=> cmdlim.0.out
+
+net x-stepgen	=> stepgen.0.position-cmd
+net x-pos-fb  	=> joint.0.motor-pos-fb
+
+net x-index-enable	<=>  joint.0.index-enable  <=>  hm2_5i25.0.encoder.02.index-enable
 net x-enable    <=  joint.0.amp-enable-out
 net x-enable	=>  stepgen.0.enable
 net x-step	<=  stepgen.0.step
 net x-dir	<=  stepgen.0.dir
-
-net x-pos-fb	<=  hm2_5i25.0.encoder.02.position
-net x-vel-fb	<=  hm2_5i25.0.encoder.02.velocity
-
-net x-index-enable	<=>  joint.0.index-enable  <=>  hm2_5i25.0.encoder.02.index-enable
-net x-pos-rawcounts	<=  hm2_5i25.0.encoder.02.rawcounts
 
 net x-home	=>  joint.0.home-sw-in
 net x-neg-limit	=>  joint.0.neg-lim-sw-in

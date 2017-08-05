@@ -1,0 +1,14 @@
+component cmdlim;
+pin in float latch;
+pin in float pid;
+pin out float out;
+parameter min;
+parameter max;
+function _;
+license "GPL"; // indicates GPL v2 or later
+;;
+
+out = pid - latch;
+if (out<min) out = min;
+if (out>max) out = max;
+
