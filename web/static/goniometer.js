@@ -5,6 +5,80 @@ function pin_name(el) {
 	return l[l.length-1];
 }
 
+function generate_prog()
+{
+	t = $("textarea.prog");
+	t.text("");
+	t.text("(Start)\n");
+	ang = parseFloat($("input[name=maxang]").val());
+	steps = parseInt($("input[name=steps]").val());
+	scantype = $("select[name=scantype]").val();
+	st = ang/steps;
+	console.log(scantype);
+	console.log("!");
+
+	t.append("F2500\n");
+	t.append("G1 U0 V0\n");
+	t.append("G1 W0\n");
+
+
+	if (scantype=="sphere"){
+	console.log("!");
+		for (i=-steps;i<=steps;i++){
+			for (j=-steps;j<=steps;j++){
+				t.append("A"+i*st +" B"+j*st+"\n");
+			}
+		}
+	}
+	
+	else if (scantype=="sphere"){
+	console.log("!");
+		for (i=-steps;i<=steps;i++){
+			for (j=-steps;j<=steps;j++){
+				t.append("G01 A"+i*st +" B"+j*st+"\n");
+				t.append("O<trigger> CALL\n");
+			}
+		}
+	}
+	
+}
+
+
+
+
+
+in_progress = 0;
+n_string = 0;
+function prog_start(){
+	n_string = -1;
+	in_progress = 1;
+}
+
+
+function prog_stop(){
+	in_progress = 0;
+}
+
+
+function prog_run(){
+	if (in_progress==1) 
+	{
+		if (true){//(get_pin("is-running") == false || true){
+			n_string +=1; 
+			prog = $("textarea.prog").text().split("\n");
+			if (n_string < prog.length)
+			{
+				c = prog[n_string];
+				if (c.trim() != "" )
+					{
+						mdi(c);
+					}
+			}
+		}
+	}
+}
+
+
 
 function load_param(){
 	send({"type":"get-param"})
@@ -208,7 +282,11 @@ function init() {
 	init_increments()
 }
 
+function mdi(c){
+	console.log("MDI ",c);
+	send({"type":"mdi","mdi":c})
+}
 
 
 setInterval(send_pin, 100);
-
+setInterval(prog_run, 500);

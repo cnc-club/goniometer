@@ -1,0 +1,20 @@
+O<trigger> SUB
+	O<trigger-if> IF [#1 LE 0]
+		#1 = 1.
+	O<trigger-if> ENDIF 
+	
+	M64P0 
+	G4 P#1
+	M65P0 
+	G4 P.2
+	M64P0 
+	G4 P#1
+	M65P0 
+	G4 P.2
+	M64P0 
+	G4 P#1
+	M65P0 
+	G4 P.2
+
+O<trigger> ENDSUB
+
