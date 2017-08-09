@@ -49,3 +49,6 @@ net zpos	=> web.zpos		<= joint.2.pos-fb
 net apos	=> web.apos		<= joint.3.pos-fb
 net bpos	=> web.bpos		<= joint.4.pos-fb
 
+
+net is-running	<= halui.program.is-running 	=> web.is-running
+

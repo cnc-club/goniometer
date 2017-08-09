@@ -88,7 +88,7 @@ class Lar():
 		
 		self.h = hal.component("web")
 		
-		self.bit_in = ["homed", "is-on", "estop-led", "global-led", "local-led", ]
+		self.bit_in = ["homed", "is-on", "estop-led", "global-led", "local-led", "is-running"]
 		self.bit_out = [
 				"reset", "estop", "home", "on", "global", "local", 
 				"xp", "xm", "yp", "ym", "zp", "zm", "ap", "am", "bp", "bm", 		

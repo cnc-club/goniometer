@@ -65,7 +65,7 @@ function prog_run(){
 	{
 		if (true){//(get_pin("is-running") == false || true){
 			n_string +=1; 
-			prog = $("textarea.prog").text().split("\n");
+			prog = $("textarea.prog").val().split("\n");
 			if (n_string < prog.length)
 			{
 				c = prog[n_string];
