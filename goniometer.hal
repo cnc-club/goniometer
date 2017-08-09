@@ -2,7 +2,7 @@
 # Все изменения в этом файле будут перезаписаны
 # при следующем запуске stepconf
 loadrt 5axis-ab
-loadrt motmod base_period_nsec=20000 servo_period_nsec=1000000 num_joints=9
+loadrt motmod base_period_nsec=20000 servo_period_nsec=1000000 num_joints=9 num_dio=3
 loadrt hal_parport cfg="0 out"
 loadrt hostmot2
 loadrt hm2_pci
@@ -12,7 +12,6 @@ loadrt sum2 count=5
 loadrt logic count=1 personality=261
 loadrt select8
 loadrt cmdlim count=5
-
 
 
 addf parport.0.read	base-thread
@@ -81,6 +80,9 @@ net  b-dir	=> parport.0.pin-17-out
 #*******************
 #  AXIS X
 #*******************
+setp cmdlim.0.min [JOINT_0]MIN_LIMIT
+setp cmdlim.0.max [JOINT_0]MAX_LIMIT
+
 net x-index-enable  <=> pid.x.index-enable
 setp  pid.x.enable 1
 net x-pos-cmd   <=  joint.0.motor-pos-cmd
@@ -92,11 +94,14 @@ net x-pos-latch	<=  hm2_5i25.0.encoder.02.position-latched
 net x-pos-cmd	=>  pid.x.command
 net x-vel-cmd	=>  pid.x.command-deriv
 net x-pos-fb	=>  pid.x.feedback
-net x-pid		=>  pid.x.output
+net x-pid	=>  pid.x.output
 
-net x-pid		=> cmdlim.0.pid
+net x-pid	=> cmdlim.0.pid
 net x-pos-latch	=> cmdlim.0.latch
 net x-stepgen	=> cmdlim.0.out
+net homed0 	=> cmdlim.0.homed
+net x-offset	=> cmdlim.0.offset
+net x-offset	<= joint.0.motor-offset
 
 net x-stepgen	=> stepgen.0.position-cmd
 net x-pos-fb  	=> joint.0.motor-pos-fb
@@ -111,73 +116,80 @@ net x-home	=>  joint.0.home-sw-in
 net x-neg-limit	=>  joint.0.neg-lim-sw-in
 net x-pos-limit	=>  joint.0.pos-lim-sw-in
 
+
+
 #*******************
 #  AXIS Y
 #*******************
+setp cmdlim.1.min [JOINT_1]MIN_LIMIT
+setp cmdlim.1.max [JOINT_1]MAX_LIMIT
+
 net y-index-enable  <=> pid.y.index-enable
 setp  pid.y.enable 1
+net y-pos-cmd   <=  joint.1.motor-pos-cmd
+net y-vel-cmd   <=  joint.1.vel-cmd
+net y-pos-fb	<=  hm2_5i25.0.encoder.01.position
+net y-pos-latch	<=  hm2_5i25.0.encoder.01.position-latched
+
 net y-pos-cmd	=>  pid.y.command
 net y-vel-cmd	=>  pid.y.command-deriv
 net y-pos-fb	=>  pid.y.feedback
-net y-output	=>  pid.y.output
-net y-err	=>  pid.y.error
+net y-pid	=>  pid.y.output
 
+net y-pid	=> cmdlim.1.pid
+net y-pos-latch	=> cmdlim.1.latch
+net y-stepgen	=> cmdlim.1.out
+net homed1 	=> cmdlim.1.homed
+net y-offset	=> cmdlim.1.offset
+net y-offset	<= joint.1.motor-offset
 
-net y-pos-fb-l	<=  hm2_5i25.0.encoder.01.position-latched =>  sum2.1.in1
-net y-output	=>  sum2.1.in0
-net y-s-cmd	<=  sum2.1.out
-net y-pos-cmd   <=  joint.1.motor-pos-cmd
-net y-vel-cmd   <=  joint.1.vel-cmd
-net y-s-cmd	=>  stepgen.1.position-cmd
-net y-pos-fb    => joint.1.motor-pos-fb
-net y-enable    <= joint.1.amp-enable-out
-net y-enable	=> stepgen.1.enable
-net y-step	<= stepgen.1.step
-net y-dir	<= stepgen.1.dir
-net y-pos-cmd   <= joint.1.motor-pos-cmd
+net y-stepgen	=> stepgen.1.position-cmd
+net y-pos-fb  	=> joint.1.motor-pos-fb
 
+net y-index-enable	<=>  joint.1.index-enable  <=>  hm2_5i25.0.encoder.01.index-enable
+net y-enable    <=  joint.1.amp-enable-out
+net y-enable	=>  stepgen.1.enable
+net y-step	<=  stepgen.1.step
+net y-dir	<=  stepgen.1.dir
 
-net y-pos-fb	<=  hm2_5i25.0.encoder.01.position
-net y-vel-fb	<=  hm2_5i25.0.encoder.01.velocity
-
-net y-index-enable  <=>  joint.1.index-enable  <=>  hm2_5i25.0.encoder.01.index-enable
-net y-pos-rawcounts	<=  hm2_5i25.0.encoder.01.rawcounts
-
-net y-home		=>  joint.1.home-sw-in
+net y-home	=>  joint.1.home-sw-in
 net y-neg-limit	=>  joint.1.neg-lim-sw-in
 net y-pos-limit	=>  joint.1.pos-lim-sw-in
 
 #*******************
 #  AXIS Z
 #*******************
+setp cmdlim.2.min [JOINT_2]MIN_LIMIT
+setp cmdlim.2.max [JOINT_2]MAX_LIMIT
+
 net z-index-enable  <=> pid.z.index-enable
 setp  pid.z.enable 1
+net z-pos-cmd   <=  joint.2.motor-pos-cmd
+net z-vel-cmd   <=  joint.2.vel-cmd
+net z-pos-fb	<=  hm2_5i25.0.encoder.00.position
+net z-pos-latch	<=  hm2_5i25.0.encoder.00.position-latched
+
+
 net z-pos-cmd	=>  pid.z.command
 net z-vel-cmd	=>  pid.z.command-deriv
 net z-pos-fb	=>  pid.z.feedback
-net z-output	=>  pid.z.output
-net z-err	=>  pid.z.error
+net z-pid	=>  pid.z.output
 
-net z-pos-fb-l	<=  hm2_5i25.0.encoder.00.position-latched =>  sum2.2.in1
-net z-output	=>  sum2.2.in0
-net z-s-cmd	<=  sum2.2.out
-net z-pos-cmd   <=  joint.2.motor-pos-cmd     
-net z-vel-cmd   <=  joint.2.vel-cmd
-net z-s-cmd	=>  stepgen.2.position-cmd
+net z-pid	=> cmdlim.2.pid
+net z-pos-latch	=> cmdlim.2.latch
+net z-stepgen	=> cmdlim.2.out
+net homed2 	=> cmdlim.2.homed
+net z-offset	=> cmdlim.2.offset
+net z-offset	<= joint.2.motor-offset
 
-net z-pos-fb	=> joint.2.motor-pos-fb
+net z-stepgen	=> stepgen.2.position-cmd
+net z-pos-fb  	=> joint.2.motor-pos-fb
 
-net z-enable    <= joint.2.amp-enable-out
-net z-enable	=> stepgen.2.enable
-net z-step	<= stepgen.2.step
-net z-dir	<= stepgen.2.dir
-net z-pos-cmd   <= joint.2.motor-pos-cmd
-
-
-net z-pos-fb	<=  hm2_5i25.0.encoder.00.position
-net z-vel-fb	<=  hm2_5i25.0.encoder.00.velocity
-net z-index-enable  <=> joint.2.index-enable  <=>  hm2_5i25.0.encoder.00.index-enable
-net z-pos-rawcounts <=  hm2_5i25.0.encoder.00.rawcounts
+net z-index-enable	<=>  joint.2.index-enable  <=>  hm2_5i25.0.encoder.00.index-enable
+net z-enable    <=  joint.2.amp-enable-out
+net z-enable	=>  stepgen.2.enable
+net z-step	<=  stepgen.2.step
+net z-dir	<=  stepgen.2.dir
 
 net z-home	=>  joint.2.home-sw-in
 net z-neg-limit	=>  joint.2.neg-lim-sw-in
@@ -187,74 +199,88 @@ net z-pos-limit	=>  joint.2.pos-lim-sw-in
 #*******************
 #  AXIS A
 #*******************
+setp cmdlim.3.min [JOINT_3]MIN_LIMIT
+setp cmdlim.3.max [JOINT_3]MAX_LIMIT
 
 net a-index-enable  <=> pid.a.index-enable
-net a-enable	=>  pid.a.enable
+setp  pid.a.enable 1
+net a-pos-cmd   <=  joint.3.motor-pos-cmd
+net a-vel-cmd   <=  joint.3.vel-cmd
+net a-pos-fb	<=  hm2_5i25.0.encoder.05.position
+net a-pos-latch	<=  hm2_5i25.0.encoder.05.position-latched
+
+
 net a-pos-cmd	=>  pid.a.command
 net a-vel-cmd	=>  pid.a.command-deriv
 net a-pos-fb	=>  pid.a.feedback
-net a-output	=>  pid.a.output
-net a-err	=>  pid.a.error
+net a-pid	=>  pid.a.output
 
-net a-pos-fb-l	<=  hm2_5i25.0.encoder.05.position-latched =>  sum2.3.in1
-net a-output	=>  sum2.3.in0
-net a-s-cmd	<=  sum2.3.out
-net a-pos-cmd   <=  joint.3.motor-pos-cmd
-net a-vel-cmd   <=  joint.3.vel-cmd
-net a-s-cmd	=>  stepgen.3.position-cmd
-net a-pos-fb    =>  joint.3.motor-pos-fb
+net a-pid	=> cmdlim.3.pid
+net a-pos-latch	=> cmdlim.3.latch
+net a-stepgen	=> cmdlim.3.out
+net homed3	=> cmdlim.3.homed
+net a-offset	=> cmdlim.3.offset
+net a-offset	<= joint.3.motor-offset
+
+
+
+net a-stepgen	=> stepgen.3.position-cmd
+net a-pos-fb  	=> joint.3.motor-pos-fb
+
+net a-index-enable	<=>  joint.3.index-enable  <=>  hm2_5i25.0.encoder.05.index-enable
 net a-enable    <=  joint.3.amp-enable-out
 net a-enable	=>  stepgen.3.enable
 net a-step	<=  stepgen.3.step
 net a-dir	<=  stepgen.3.dir
-
-
-net a-pos-fb	<=  hm2_5i25.0.encoder.05.position
-net a-vel-fb	<=  hm2_5i25.0.encoder.05.velocity
-net a-pos-fb	=>  joint.3.motor-pos-fb
-net a-index-enable  <=> joint.3.index-enable  <=>  hm2_5i25.0.encoder.05.index-enable
-net a-pos-rawcounts <=  hm2_5i25.0.encoder.06.rawcounts
 
 net a-home	=>  joint.3.home-sw-in
 net a-neg-limit	=>  joint.3.neg-lim-sw-in
 net a-pos-limit	=>  joint.3.pos-lim-sw-in
 
 
+
 #*******************
 #  AXIS B
 #*******************
+setp cmdlim.4.min [JOINT_4]MIN_LIMIT
+setp cmdlim.4.max [JOINT_4]MAX_LIMIT
 
 net b-index-enable  <=> pid.b.index-enable
-net b-enable	=>  pid.b.enable
+setp  pid.b.enable 1
+net b-pos-cmd   <=  joint.4.motor-pos-cmd
+net b-vel-cmd   <=  joint.4.vel-cmd
+net b-pos-fb	<=  hm2_5i25.0.encoder.04.position
+net b-pos-latch	<=  hm2_5i25.0.encoder.04.position-latched
+
+
 net b-pos-cmd	=>  pid.b.command
 net b-vel-cmd	=>  pid.b.command-deriv
 net b-pos-fb	=>  pid.b.feedback
-net b-output	=>  pid.b.output
-net b-err	=>  pid.b.error
+net b-pid	=>  pid.b.output
 
-net b-pos-fb-l	<=  hm2_5i25.0.encoder.04.position-latched =>  sum2.4.in1
-net b-output	=>  sum2.4.in0
-net b-s-cmd	<=  sum2.4.out
-net b-pos-cmd   <=  joint.4.motor-pos-cmd
-net b-vel-cmd   <=  joint.4.vel-cmd
-net b-pos-fb    =>  joint.4.motor-pos-fb
+net b-pid	=> cmdlim.4.pid
+net b-pos-latch	=> cmdlim.4.latch
+net b-stepgen	=> cmdlim.4.out
+net homed4 	=> cmdlim.4.homed
+net b-offset	=> cmdlim.4.offset
+net b-offset	<= joint.4.motor-offset
+
+
+net b-stepgen	=> stepgen.4.position-cmd
+net b-pos-fb  	=> joint.4.motor-pos-fb
+
+net b-index-enable	<=>  joint.4.index-enable  <=>  hm2_5i25.0.encoder.04.index-enable
 net b-enable    <=  joint.4.amp-enable-out
-net b-pos-cmd   <=  joint.4.motor-pos-cmd
-net b-pos-fb	=>  joint.4.motor-pos-fb
-net b-s-cmd	=>  stepgen.4.position-cmd
 net b-enable	=>  stepgen.4.enable
 net b-step	<=  stepgen.4.step
 net b-dir	<=  stepgen.4.dir
 
-
-net b-pos-fb	<=  hm2_5i25.0.encoder.04.position
-net b-vel-fb	<=  hm2_5i25.0.encoder.04.velocity
-net b-index-enable  <=> joint.4.index-enable  <=>  hm2_5i25.0.encoder.04.index-enable
-net b-pos-rawcounts <=  hm2_5i25.0.encoder.04.rawcounts
-
 net b-home	=>  joint.4.home-sw-in
 net b-neg-limit	=>  joint.4.neg-lim-sw-in
 net b-pos-limit	=>  joint.4.pos-lim-sw-in
+
+
+
 
 net homed0 	<= joint.0.homed		=> logic.0.in-00
 net homed1 	<= joint.1.homed		=> logic.0.in-01
@@ -268,7 +294,8 @@ net u-pos-cmd   <=  joint.6.motor-pos-cmd joint.6.motor-pos-fb
 net v-pos-cmd   <=  joint.7.motor-pos-cmd joint.7.motor-pos-fb
 net w-pos-cmd   <=  joint.8.motor-pos-cmd joint.8.motor-pos-fb
 
-
+net trigger	=> hm2_5i25.0.7i77.0.1.spinena
+net trigger 	<=  motion.digital-out-00
 
 net tool-ch	<= iocontrol.0.tool-change	=> iocontrol.0.tool-changed
 net tool-pre	<= iocontrol.0.tool-prepare	=> iocontrol.0.tool-prepared
