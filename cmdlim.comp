@@ -1,0 +1,18 @@
+component cmdlim;
+pin in float latch;
+pin in float pid;
+pin in float offset;
+pin out float out;
+pin in bit homed;
+
+param rw float min;
+param rw float max;
+function _;
+license "GPL"; // indicates GPL v2 or later
+;;
+out = pid;
+if (homed){
+	if (out<min+offset) out = min+offset;
+	if (out>max+offset) out = max+offset;
+}
+out -= latch;
