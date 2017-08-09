@@ -31,6 +31,26 @@
 </ul>
 </div>
 
+
+<div class="panel">
+	<h1>Prog</h1>
+	<input type="button" value="Start" onclick="prog_start()">
+	<input type="button" value="Stop" onclick="prog_stop()">
+	<span class="pin-in led on is-running"></span>
+	<ul class="prog">
+		<li>Максимальниый угол <input type="number" name="maxang" value="10" step="0.01">
+		<li>Количество шагов <input type="number" name="steps" value="5" min="1">
+		<li>Тип сканирования
+			<select name="scantype">
+				<option value="sphere" selected>Сфера</option>
+			</select>
+	</ul>
+	
+	<input type="button" value="Генерация программы сканирования" onclick="generate_prog()">
+	<textarea class="prog"></textarea>
+</div>	
+
+
 <div class="panel">
 	<h1>Управление</h1>
 		<div>
@@ -43,7 +63,7 @@
 			<span class="pin-in led on local-led">
 		</div>
 
-
+</div>
 <div class="panel">
 	<h1>JOG</h1>
 	<ul class="jog">

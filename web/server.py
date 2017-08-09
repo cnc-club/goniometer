@@ -68,6 +68,12 @@ class WebSocketsHandler(tornado.websocket.WebSocketHandler):
 				message = {"type":"pin", "pin":pins}	
 				ws.write_message(json.dumps(message))									
 				
+			if message["type"] == "mdi":
+				cmd = message["mdi"]
+
+				lar.c.mode(linuxcnc.MODE_MDI)
+				lar.c.wait_complete() # wait until mode switch executed
+				lar.c.mdi(cmd)
 				  
 	def on_close(self):
 		print("socket closed")
@@ -78,6 +84,7 @@ class Lar():
 	def __init__(self):
 		self.config = ConfigParser.ConfigParser()
 		self.load_cfg()
+		self.c = linuxcnc.command()
 		
 		self.h = hal.component("web")
 		
