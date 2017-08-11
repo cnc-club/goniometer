@@ -8,180 +8,198 @@
 
 
 <body>
-
-<div class="panel status">
-	<h1>Статус</h1>
-	<ul class="status">
-		<li><span class="pin-in led on estop"></span><input type="button" class="pin-out estop" value=" АВОСТ"> <input type="button" class="pin-out reset" value="Сброс">
-		<li><span class="pin-in led off is-on"></span> <input type="button" class="pin-out on" value="Вкл">
-		<li><span class="pin-in led off homed"></span> <input type="button" class="pin-out home" value="Поиск нулей">
+<div class="header">
+	<div class="panel status">
+		<h1>Статус</h1>
+		<ul class="status">
+			<li><span class="pin-in led on estop"></span><input type="button" class="pin-out estop" value=" АВОСТ"> <input type="button" class="pin-out reset" value="Сброс">
+			<li><span class="pin-in led off is-on"></span> <input type="button" class="pin-out on" value="Вкл">
+			<li><span class="pin-in led off homed"></span> <input type="button" class="pin-out home" value="Поиск нулей">
 		
-	</ul>
+		</ul>
+	</div>
+	<div class="panel">
+		<h1>Координаты</h1>
+		<ul>
+			<li>X<span class="pin-in pin-float xpos">0</span>
+			<li>Y<span class="pin-in pin-float ypos">0</span>
+			<li>Z<span class="pin-in pin-float zpos">0</span>
+			<li>A<span class="pin-in pin-float apos">0</span>
+			<li>B<span class="pin-in pin-float bpos">0</span>
+		</ul>
+	</div>
 </div>
 
-
-<div class="panel">
-<h1>Координаты</h1>
-<ul>
-	<li>X<span class="pin-in pin-float xpos">0</span>
-	<li>Y<span class="pin-in pin-float ypos">0</span>
-	<li>Z<span class="pin-in pin-float zpos">0</span>
-	<li>A<span class="pin-in pin-float apos">0</span>
-	<li>B<span class="pin-in pin-float bpos">0</span>
-</ul>
-</div>
+<div class="selector panel">
+</div>		
 
 
-<div class="panel">
-	<h1>Prog</h1>
-	<input type="button" value="Start" onclick="prog_start()">
-	<input type="button" value="Stop" onclick="prog_stop()">
-	<span class="pin-in led on is-running"></span>
-	<ul class="prog">
-		<li>Максимальниый угол <input type="number" name="maxang" value="10" step="0.01">
-		<li>Количество шагов <input type="number" name="steps" value="5" min="1">
-		<li>Тип сканирования
-			<select name="scantype">
-				<option value="sphere" selected>Сфера</option>
-			</select>
-	</ul>
+<div class="pages">
+	<div class="page">
+
+		<div class="panel prog">
+			<h1>Программа сканирования</h1>
+				<textarea class="prog">
+			m64p0
+			m65p0
+			</textarea>
 	
-	<input type="button" value="Генерация программы сканирования" onclick="generate_prog()">
-	<textarea class="prog">
-	m64p0
-	m65p0
-	</textarea>
-</div>	
+			<input type="button" value="Start" onclick="prog_start()">
+			<input type="button" value="Stop" onclick="prog_stop()">
+			<span class="pin-in led on is-running"></span>
+			<ul class="prog">
+				<li>Максимальниый угол <input type="number" name="maxang" value="10" step="0.01">
+				<li>Количество шагов <input type="number" name="steps" value="5" min="1">
+				<li>Тип сканирования
+					<select name="scantype">
+						<option value="sphere" selected>Сфера</option>
+						<option value="vert" >Вертикаль</option>
+						<option value="hor"  >Горизонталь</option>
+					</select>
+			</ul>
+	
+			<input type="button" value="Генерация программы сканирования" onclick="generate_prog()">
 
-
-<div class="panel">
-	<h1>Управление</h1>
-		<div>
-			<input type="button" class="pin-out global" value="Глобальные координаты">
-			<span class="pin-in led on global-led">
-			
 		</div>	
-		<div>		
-			<input type="button" class="pin-out local" value="Локальные координаты">
-			<span class="pin-in led on local-led">
+
+		<div class="panel mdi">
+			<h1>MDI</h1>
+			<input type="text" class="mdi" value="">
+			<input type="button" value="Выполнить" onclick="mdi($('input.mdi').val());">
+		</div>
+		
+	</div>
+
+	<div class="page">
+
+		<div class="panel">
+			<h1>JOG</h1>
+			<div class="panel global-local">
+				<h1>Управление</h1>
+					<div>
+						<input type="button" class="pin-out global" value="Глобальные координаты">
+						<span class="pin-in led on global-led">
+			
+					</div>	
+					<div>		
+						<input type="button" class="pin-out local" value="Локальные координаты">
+						<span class="pin-in led on local-led">
+					</div>
+
+			</div>
+			<ul class="jog">
+				<li><input type="button" class="pin-out zp" value="Z+">
+				<li><input type="button" class="pin-out yp" value="Y+">
+				<li> &nbsp;
+				<li> &nbsp;
+				<li><input type="button" class="pin-out bp" value="B+">
+				<li> &nbsp;
+				<li><input type="button" class="pin-out xm" value="X-">
+				<li> &nbsp;
+				<li><input type="button" class="pin-out xp" value="X+">
+				<li><input type="button" class="pin-out am" value="A-">
+				<li> &nbsp;
+				<li><input type="button" class="pin-out ap" value="A+">
+				<li><input type="button" class="pin-out zm" value="Z-">
+				<li><input type="button" class="pin-out ym" value="Y-">
+				<li> &nbsp;
+				<li> &nbsp;
+				<li><input type="button" class="pin-out bm" value="B-">
+				<li> &nbsp;
+			</ul>	
+	
+			<input type="button" class="keyboard-jog" value="Управление от клавиатуры"> 
+	
+			<div class="panel">
+				<h2>Инкременты</h2>
+				<ul class="increments">
+					<li><input type="radio" name="increment" class="inc inc-49" value="0.1" checked> 0.1 
+					<li><input type="radio" name="increment" class="inc inc-50" value="1"> 1
+					<li><input type="radio" name="increment" class="inc inc-51" value="5"> 5 
+					<li><input type="radio" name="increment" class="inc inc-52" value="10"> 10
+					<li><input type="radio" name="increment" class="inc inc-53" value="50"> 50
+					<li><input type="radio" name="increment" class="inc inc-54" value="0"> ~~~
+				</ul>
+				<input type="hidden" class="pin-out increment" value="0">
+		
+				Скорость <input type="number" step="100" value="2500" min="0" max="4000" class="pin-out pin-float jog-speed">
+			</div>
+		</div>
+	</div>
+	<div class="page">
+		<div class="panel">
+			<h1>Выбор инструмента</h1>
+			<ul class="increments">
+				<li><input type="button" class="tool-1" value="1" onclick="mdi('O<change_tool> CALL [1]')"> 
+				<li><input type="button" class="tool-1" value="2" onclick="mdi('O<change_tool> CALL [2]')"> 
+				<li><input type="button" class="tool-1" value="3" onclick="mdi('O<change_tool> CALL [3]')"> 
+				<li><input type="button" class="tool-1" value="4" onclick="mdi('O<change_tool> CALL [4]')"> 
+				<li><input type="button" class="tool-1" value="5" onclick="mdi('O<change_tool> CALL [5]')"> 
+			</ul>
+		</div>
+	</div>
+
+	<div class="page">
+		<div class="panel params">
+			<h1>Параметры</h1>
+			<p>Сейчас активирован:<span class="pin-in tool"></span></p>
+
+			<div class="panel">
+				<h2>Инсрумент 1</h2>
+				<dl class="tool1">
+						<dt>Название<dd>	<input class="param tool1-name" >
+						<dt>X корректор<dd>	<input type="number" class="param tool1-x" >
+						<dt>Y корректор<dd>	<input type="number" class="param tool1-y" >
+						<dt>Z корректор<dd>	<input type="number" class="param tool1-z" >
+						<dt>Фокус<dd>		<input type="number" class="param tool1-f" >
+			
+				</dl>
+			</div>
+			<div class="panel">
+				<h2>Инсрумент 2</h2>
+				<dl class="tool2">
+						<dt>Название<dd>	<input class="param tool2-name" >
+						<dt>X корректор<dd>	<input type="number" class="param tool2-x" >
+						<dt>Y корректор<dd>	<input type="number" class="param tool2-y" >
+						<dt>Z корректор<dd>	<input type="number" class="param tool2-z" >
+						<dt>Фокус<dd>		<input type="number" class="param tool2-f" >
+				</dl>
+			</div>
+			<div class="panel">
+				<h2>Инсрумент 3</h2>
+				<dl class="tool3">
+						<dt>Название<dd>	<input class="param tool2-name" >
+						<dt>X корректор<dd>	<input type="number" class="param tool2-x" >
+						<dt>Y корректор<dd>	<input type="number" class="param tool2-y" >
+						<dt>Z корректор<dd>	<input type="number" class="param tool2-z" >
+						<dt>Фокус<dd>		<input type="number" class="param tool2-f" >
+				</dl>
+			</div>
+			<div class="panel">
+				<h2>Инсрумент 4</h2>
+				<dl class="tool4">
+						<dt>Название<dd>	<input class="param tool2-name" >
+						<dt>X корректор<dd>	<input type="number" class="param tool2-x" >
+						<dt>Y корректор<dd>	<input type="number" class="param tool2-y" >
+						<dt>Z корректор<dd>	<input type="number" class="param tool2-z" >
+						<dt>Фокус<dd>		<input type="number" class="param tool2-f" >
+				</dl>
+			</div>
+			<div class="panel">
+				<h2>Инсрумент 5</h2>
+				<dl class="tool5">
+						<dt>Название<dd>	<input class="param tool2-name" >
+						<dt>X корректор<dd>	<input type="number" class="param tool2-x" >
+						<dt>Y корректор<dd>	<input type="number" class="param tool2-y" >
+						<dt>Z корректор<dd>	<input type="number" class="param tool2-z" >
+						<dt>Фокус<dd>		<input type="number" class="param tool2-f" >
+
+				</dl>
+			</div>
 		</div>
 
-</div>
-<div class="panel">
-	<h1>JOG</h1>
-	<ul class="jog">
-		<li><input type="button" class="pin-out zp" value="Z+">
-		<li><input type="button" class="pin-out yp" value="Y+">
-		<li> &nbsp;
-		<li> &nbsp;
-		<li><input type="button" class="pin-out bp" value="B+">
-		<li> &nbsp;
-		<li><input type="button" class="pin-out xm" value="X-">
-		<li> &nbsp;
-		<li><input type="button" class="pin-out xp" value="X+">
-		<li><input type="button" class="pin-out am" value="A-">
-		<li> &nbsp;
-		<li><input type="button" class="pin-out ap" value="A+">
-		<li><input type="button" class="pin-out zm" value="Z-">
-		<li><input type="button" class="pin-out ym" value="Y-">
-		<li> &nbsp;
-		<li> &nbsp;
-		<li><input type="button" class="pin-out bm" value="B-">
-		<li> &nbsp;
-	</ul>	
-	
-	<input type="button" class="keyboard-jog" value="Управление от клавиатуры"> 
-	
-	<div class="panel">
-		<h2>Инкременты</h2>
-		<ul class="increments">
-			<li><input type="radio" name="increment" class="inc inc-49" value="0.1" checked> 0.1 
-			<li><input type="radio" name="increment" class="inc inc-50" value="1"> 1
-			<li><input type="radio" name="increment" class="inc inc-51" value="5"> 5 
-			<li><input type="radio" name="increment" class="inc inc-52" value="10"> 10
-			<li><input type="radio" name="increment" class="inc inc-53" value="50"> 50
-			<li><input type="radio" name="increment" class="inc inc-54" value="0"> ~~~
-		</ul>
-		<input type="hidden" class="pin-out increment" value="0">
-		
-		Скорость <input type="number" step="100" value="2500" min="0" max="4000" class="pin-out pin-float jog-speed">
 	</div>
 </div>
-
-
-
-
-<div class="panel">
-	<h1>Выбор инструмента</h1>
-	<p>Сейчас активирован:<span class="pin-in tool"></span></p>
-	<ul class="increments">
-		<li><input type="button" class="tool-1" value="1"> 
-		<li><input type="button" class="tool-2" value="2"> 
-		<li><input type="button" class="tool-3" value="3"> 
-		<li><input type="button" class="tool-4" value="4"> 
-		<li><input type="button" class="tool-5" value="5"> 
-	</ul>
-</div>
-
-<div class="panel params">
-	<h1>Параметры</h1>
-	<p>Сейчас активирован:<span class="pin-in tool"></span></p>
-
-	<div class="panel">
-		<h2>Инсрумент 1</h2>
-		<dl class="tool1">
-				<dt>Название<dd>	<input class="param tool1-name" >
-				<dt>X корректор<dd>	<input type="number" class="param tool1-x" >
-				<dt>Y корректор<dd>	<input type="number" class="param tool1-y" >
-				<dt>Z корректор<dd>	<input type="number" class="param tool1-z" >
-				<dt>Фокус<dd>		<input type="number" class="param tool1-f" >
-			
-		</dl>
-	</div>
-	<div class="panel">
-		<h2>Инсрумент 2</h2>
-		<dl class="tool2">
-				<dt>Название<dd>	<input class="param tool2-name" >
-				<dt>X корректор<dd>	<input type="number" class="param tool2-x" >
-				<dt>Y корректор<dd>	<input type="number" class="param tool2-y" >
-				<dt>Z корректор<dd>	<input type="number" class="param tool2-z" >
-				<dt>Фокус<dd>		<input type="number" class="param tool2-f" >
-		</dl>
-	</div>
-	<div class="panel">
-		<h2>Инсрумент 3</h2>
-		<dl class="tool3">
-				<dt>Название<dd>	<input class="param tool2-name" >
-				<dt>X корректор<dd>	<input type="number" class="param tool2-x" >
-				<dt>Y корректор<dd>	<input type="number" class="param tool2-y" >
-				<dt>Z корректор<dd>	<input type="number" class="param tool2-z" >
-				<dt>Фокус<dd>		<input type="number" class="param tool2-f" >
-		</dl>
-	</div>
-	<div class="panel">
-		<h2>Инсрумент 4</h2>
-		<dl class="tool4">
-				<dt>Название<dd>	<input class="param tool2-name" >
-				<dt>X корректор<dd>	<input type="number" class="param tool2-x" >
-				<dt>Y корректор<dd>	<input type="number" class="param tool2-y" >
-				<dt>Z корректор<dd>	<input type="number" class="param tool2-z" >
-				<dt>Фокус<dd>		<input type="number" class="param tool2-f" >
-		</dl>
-	</div>
-	<div class="panel">
-		<h2>Инсрумент 5</h2>
-		<dl class="tool5">
-				<dt>Название<dd>	<input class="param tool2-name" >
-				<dt>X корректор<dd>	<input type="number" class="param tool2-x" >
-				<dt>Y корректор<dd>	<input type="number" class="param tool2-y" >
-				<dt>Z корректор<dd>	<input type="number" class="param tool2-z" >
-				<dt>Фокус<dd>		<input type="number" class="param tool2-f" >
-
-		</dl>
-	</div>
-</div>
-
-
 
 
 <div class="panel status">

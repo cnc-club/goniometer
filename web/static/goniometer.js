@@ -23,22 +23,27 @@ function generate_prog()
 
 
 	if (scantype=="sphere"){
-	console.log("!");
-		for (i=-steps;i<=steps;i++){
-			for (j=-steps;j<=steps;j++){
-				t.append("A"+i*st +" B"+j*st+"\n");
-			}
-		}
-	}
-	
-	else if (scantype=="sphere"){
-	console.log("!");
 		for (i=-steps;i<=steps;i++){
 			for (j=-steps;j<=steps;j++){
 				t.append("G01 A"+i*st +" B"+j*st+"\n");
-				t.append("O<trigger> CALL\n");
+				t.append("O&lt;trigger&gt; CALL\n");
 			}
+			t.append("G01 A0\n");
+
 		}
+	} else if(scantype=="vert") {
+		for (i=-steps;i<=steps;i++){
+				t.append("G01 B"+i*st+"\n");
+				t.append("O&lt;trigger&gt; CALL\n");
+		}
+		t.append("G01 B0\n");
+
+	} else if(scantype=="vert") {
+		for (i=-steps;i<=steps;i++){
+				t.append("G01 A"+i*st+"\n");
+				t.append("O&lt;trigger&gt; CALL\n");
+		}
+		t.append("G01 A0\n");
 	}
 	
 }
@@ -217,7 +222,22 @@ function init() {
 	socket.onclose = function(event) {}
 	socket.onerror = function(event) {}
 	
-	
+	page_count = 0;
+	$(".page").each(function(){
+		$(this).addClass("page-"+page_count);
+		n = $("h1",this).first().text();	
+		$("div.selector").append("<a class='selector' rel='page-"+page_count+"'>"+n+"</a> ")
+		page_count +=1;
+	});
+	$("a.selector").click(function(){
+		console.log($(this).attr("rel"));
+		c = $(this).attr("rel"); 
+		$(".page").hide();
+		$(".page."+c).show();
+		$("a.selector").removeClass("active");
+		$(this).addClass("active");
+	});
+	$("a.selector").first().trigger("click");
 	$("input:button").mousedown(function(){$(this).attr("active",true); send_pin();} );
 	$("input:button").mouseup(function(){$(this).attr("active",false);  send_pin();} );
 	$("input:button").mouseleave(function(){$(this).attr("active",false);  send_pin();} );
@@ -283,8 +303,11 @@ function init() {
 }
 
 function mdi(c){
-	console.log("MDI ",c);
-	send({"type":"mdi","mdi":c})
+	if (c.trim()!="")
+	{
+		console.log("MDI ",c);
+		send({"type":"mdi","mdi":c})
+	}
 }
 
 

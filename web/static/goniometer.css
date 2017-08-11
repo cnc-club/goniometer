@@ -3,9 +3,35 @@ h1{margin:0px;padding:0px;}
 h2{margin:0px;padding:0px;font-size:1em;}
 ul {list-style:none; margin: 0px; padding:0px;}
 
+.header .panel {align-items: stretch; float:left; margin: 5px;}
+.header {	
+	display: flex; 
+	width: 100%; 	
+	overflow: hidden;
+	margin: 5px;
+}
+
+.selector.panel {clear:both;display:block; margin:5px 0px;padding:10px 5px;width:100%;}
+a.selector {
+	padding: 5px 20px;
+	margin:5px;
+}
+
+.page{
+	width:100%;
+}
+
+.page>.panel{
+	width:100%;
+}
+
+a.selector.active {
+	border-radius: 5px 5px 5px 5px;
+	box-shadow: 2px 2px 7px rgba(0,0,0,.5);
+	background: #fff;
+}
 ul.increments{
 	list-style:none;
-	width:450px;
 }
 
 ul.increments li{
@@ -14,10 +40,11 @@ ul.increments li{
 	float:left;
 }
 
+.panel.global-local {float:right;}
 
 ul.jog{
+	width: 420px;
 	list-style:none;
-	width:450px;
 }
 
 ul.jog li{
@@ -76,8 +103,16 @@ div.panel {
 	width:250px; 
 }
 
-.panel.params{width:400px;}
 dl {overflow: hidden;}
 dt {float: left; width:150px;}
 dd {width:100px;margin-left:150px;}
 dd input {width:100%;}
+
+
+textarea.prog {
+	float: right;
+	width: 60%;
+	height: 300px;
+}
+
+
