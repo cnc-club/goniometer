@@ -1,5 +1,5 @@
-T1 P1 X0 Z0 U0 W0 ;laser 
-T2 P2 X0 Z0 U50 V50 W10 D20 ;nikon lens 
-T3 P3 Z0 U-50 V0 W30 D30 ;radiometer 
-T99999 P99999 Z0.1 ;big tool number 
-T4 P4 W80 D40 ;added 20170714 
+T1 P1 W1000 ;laser 
+T2 P2 U128.5 V-2 W1000 ;nikon lens 
+T3 P3 W1000 ;radiometer 
+T4 P4 W1000 ;added 20170714 
+T5 P5 W1000 ;added 20170811 

@@ -1,4 +1,6 @@
 loadusr -Wn web ./web.sh
+loadusr -Wn mdi web/mdi.py
+
 setp halui.axis.jog-deadband 0.05
 setp halui.joint.jog-deadband 0.05
 
@@ -43,12 +45,15 @@ net am1		<= web.amc		=> halui.axis.a.minus			=> halui.joint.3.minus
 net bp1		<= web.bpc		=> halui.axis.b.plus			=> halui.joint.4.plus
 net bm1		<= web.bmc		=> halui.axis.b.minus			=> halui.joint.4.minus
 
-net xpos	=> web.xpos		<= joint.0.pos-fb
-net ypos	=> web.ypos		<= joint.1.pos-fb
-net zpos	=> web.zpos		<= joint.2.pos-fb
-net apos	=> web.apos		<= joint.3.pos-fb
-net bpos	=> web.bpos		<= joint.4.pos-fb
+net xpos	=> web.xpos		<= axis.x.pos-cmd
+net ypos	=> web.ypos		<= axis.y.pos-cmd
+net zpos	=> web.zpos		<= axis.z.pos-cmd
+net apos	=> web.apos		<= axis.a.pos-cmd
+net bpos	=> web.bpos		<= axis.b.pos-cmd
 
 
-net is-running	<= halui.program.is-running 	=> web.is-running
+net mdi-busy	<= mdi.busy		=> web.mdi-busy
+net mdi-run	<= mdi.run		=> web.mdi-run
+
+
 

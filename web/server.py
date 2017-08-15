@@ -65,15 +65,20 @@ class WebSocketsHandler(tornado.websocket.WebSocketHandler):
 				pins = {}
 				for p in lar.float_in+lar.bit_in :
 					pins[p] = lar.h[p]
+					
+				lar.stat.poll()
+				#print lar.stat.state
+
 				message = {"type":"pin", "pin":pins}	
 				ws.write_message(json.dumps(message))									
 				
 			if message["type"] == "mdi":
-				cmd = message["mdi"]
-
-				lar.c.mode(linuxcnc.MODE_MDI)
-				lar.c.wait_complete() # wait until mode switch executed
-				lar.c.mdi(cmd)
+				if lar.h["mdi-busy"] == False :
+					cmd = message["mdi"]
+					f = open(os.path.dirname(os.path.realpath(__file__))+"/mdi_command","w")
+					f.write(message["mdi"])
+					f.close()
+					lar.h["mdi-run"] = not lar.h["mdi-run"]
 				  
 	def on_close(self):
 		print("socket closed")
@@ -85,14 +90,16 @@ class Lar():
 		self.config = ConfigParser.ConfigParser()
 		self.load_cfg()
 		self.c = linuxcnc.command()
+		self.stat = linuxcnc.stat()
 		
 		self.h = hal.component("web")
 		
-		self.bit_in = ["homed", "is-on", "estop-led", "global-led", "local-led", "is-running"]
+		self.bit_in = ["homed", "is-on", "estop-led", "global-led", "local-led", "mdi-busy"]
 		self.bit_out = [
 				"reset", "estop", "home", "on", "global", "local", 
 				"xp", "xm", "yp", "ym", "zp", "zm", "ap", "am", "bp", "bm", 		
 				"xpc", "xmc", "ypc", "ymc", "zpc", "zmc", "apc", "amc", "bpc", "bmc", 		
+				"mdi-run",
 				]
 		self.float_out = [ "increment", "jog-speed", ]
 		self.float_in  = [ "xpos", "ypos", "zpos", "apos", "bpos", ]

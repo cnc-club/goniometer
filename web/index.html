@@ -39,16 +39,19 @@
 
 		<div class="panel prog">
 			<h1>Программа сканирования</h1>
-				<textarea class="prog">
+			<textarea class="csv">
+			</textarea>
+
+			<textarea class="prog">
 			m64p0
 			m65p0
 			</textarea>
 	
 			<input type="button" value="Start" onclick="prog_start()">
 			<input type="button" value="Stop" onclick="prog_stop()">
-			<span class="pin-in led on is-running"></span>
+			<span class="pin-in led on mdi-busy"></span>
 			<ul class="prog">
-				<li>Максимальниый угол <input type="number" name="maxang" value="10" step="0.01">
+				<li>Максимальный угол <input type="number" name="maxang" value="10" step="0.01">
 				<li>Количество шагов <input type="number" name="steps" value="5" min="1">
 				<li>Тип сканирования
 					<select name="scantype">
@@ -58,15 +61,30 @@
 					</select>
 			</ul>
 	
+			Integration time <input type="number" name="integration" value="2" step="0.1">
+			
 			<input type="button" value="Генерация программы сканирования" onclick="generate_prog()">
 
 		</div>	
 
 		<div class="panel mdi">
-			<h1>MDI</h1>
-			<input type="text" class="mdi" value="">
-			<input type="button" value="Выполнить" onclick="mdi($('input.mdi').val());">
+			<h1>Trigger</h1>
+			<input type="button" value="Выполнить" onclick="mdi('O<trigger> CALL');">
 		</div>
+
+		<div class="panel mdi">
+			<h1>MDI</h1>
+			<input type="text" class="mdi" id="mdi-input" value="">
+			<input type="button" value="Выполнить" id="mdi-button" onclick="mdi($('input.mdi').val());">
+			<script>
+			$("#mdi-input").keyup(function(event){
+   			 if(event.keyCode == 13){
+			        $("#mdi-button").click();
+			    }
+			});
+			</script>
+		</div>
+
 		
 	</div>
 
@@ -130,11 +148,11 @@
 		<div class="panel">
 			<h1>Выбор инструмента</h1>
 			<ul class="increments">
-				<li><input type="button" class="tool-1" value="1" onclick="mdi('O<change_tool> CALL [1]')"> 
-				<li><input type="button" class="tool-1" value="2" onclick="mdi('O<change_tool> CALL [2]')"> 
-				<li><input type="button" class="tool-1" value="3" onclick="mdi('O<change_tool> CALL [3]')"> 
-				<li><input type="button" class="tool-1" value="4" onclick="mdi('O<change_tool> CALL [4]')"> 
-				<li><input type="button" class="tool-1" value="5" onclick="mdi('O<change_tool> CALL [5]')"> 
+				<li><input type="button" class="tool-1" value="1" onclick="mdi('O<tool_change> CALL [1]')"> Лазер
+				<li><input type="button" class="tool-1" value="2" onclick="mdi('O<tool_change> CALL [2]')"> TOP 200
+				<li><input type="button" class="tool-1" value="3" onclick="mdi('O<tool_change> CALL [3]')"> EOP-120
+				<li><input type="button" class="tool-1" value="4" onclick="mdi('O<tool_change> CALL [4]')"> EOP-146
+				<li><input type="button" class="tool-1" value="5" onclick="mdi('O<tool_change> CALL [5]')"> -----
 			</ul>
 		</div>
 	</div>

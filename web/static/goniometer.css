@@ -111,8 +111,16 @@ dd input {width:100%;}
 
 textarea.prog {
 	float: right;
-	width: 60%;
+	width: 40%;
 	height: 300px;
 }
+
+textarea.csv {
+	tab-size: 5;
+	float: right;
+	width: 20%;
+	height: 300px;
+}
+
 
 

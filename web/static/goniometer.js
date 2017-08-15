@@ -12,6 +12,7 @@ function generate_prog()
 	t.text("(Start)\n");
 	ang = parseFloat($("input[name=maxang]").val());
 	steps = parseInt($("input[name=steps]").val());
+	integration = parseFloat($("input[name=integration]").val());
 	scantype = $("select[name=scantype]").val();
 	st = ang/steps;
 	console.log(scantype);
@@ -20,32 +21,42 @@ function generate_prog()
 	t.append("F2500\n");
 	t.append("G1 U0 V0\n");
 	t.append("G1 W0\n");
-
-
+	coords = []
 	if (scantype=="sphere"){
 		for (i=-steps;i<=steps;i++){
 			for (j=-steps;j<=steps;j++){
 				t.append("G01 A"+i*st +" B"+j*st+"\n");
-				t.append("O&lt;trigger&gt; CALL\n");
+				t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+				coords.push([i*st,j*st])
 			}
-			t.append("G01 A0\n");
-
 		}
+		t.append("G01 A0 B0\n");		
+		
 	} else if(scantype=="vert") {
 		for (i=-steps;i<=steps;i++){
 				t.append("G01 B"+i*st+"\n");
-				t.append("O&lt;trigger&gt; CALL\n");
+				t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+				coords.push([0*st,i*st]);
 		}
 		t.append("G01 B0\n");
 
-	} else if(scantype=="vert") {
+	} else if(scantype=="hor") {
 		for (i=-steps;i<=steps;i++){
 				t.append("G01 A"+i*st+"\n");
-				t.append("O&lt;trigger&gt; CALL\n");
+				t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+				coords.push([i*st,0*st]);
 		}
 		t.append("G01 A0\n");
 	}
-	
+	csv = $("textarea.csv");
+	csv.text("");
+	i = 0;
+	csv.append("Номер	A	B\n");
+	for (a1 in coords) {
+		a = coords[a1];
+		i+=1;
+		csv.append(i+"	"+a[0]+"	"+a[1]+"\n");
+	}
 }
 
 
@@ -68,7 +79,8 @@ function prog_stop(){
 function prog_run(){
 	if (in_progress==1) 
 	{
-		if (true){//(get_pin("is-running") == false || true){
+		send_pin();
+		if (get_pin_value("mdi-busy") == false){
 			n_string +=1; 
 			prog = $("textarea.prog").val().split("\n");
 			if (n_string < prog.length)
@@ -109,24 +121,33 @@ function set_param(param){
 
 }
 
+function value_from_el(el){
+	if (el.type=="radio"){
+		return el.checked;
+	}
+	else if (el.type=="button")
+	{	
+		return $(el).attr("active")=="true";
+	}
+	else if (el.nodeName=="SPAN"){
+		return $(el).hasClass("on");
+	}
+	else 
+	{	
+		return el.value;
+	}
+}
+
+function get_pin_value(n){
+	p = $(".pin-out."+n+", .pin-in."+n);
+	return value_from_el(p[0]);
+}
+
 function get_pin()
 {
 	hal = {}
 	$(".pin-out").each(function(){
-		
-		if (this.type=="radio"){
-			hal[pin_name(this)] = this.checked;
-		}
-		else if (this.type=="button")
-		{	
-			hal[pin_name(this)] = $(this).attr("active")=="true";
-		}
-		else 
-		{	
-			hal[pin_name(this)] = this.value;
-		}
-		
-		
+		hal[pin_name(this)] = value_from_el(this);
 	});
 	return hal;
 	
