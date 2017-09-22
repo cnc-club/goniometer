@@ -5,15 +5,23 @@ function pin_name(el) {
 	return l[l.length-1];
 }
 
-function generate_prog()
+function generate_prog(s_type="")
 {
+
 	t = $("textarea.prog");
 	t.text("");
 	t.text("(Start)\n");
 	ang = parseFloat($("input[name=maxang]").val());
 	steps = parseInt($("input[name=steps]").val());
+	w = parseFloat($("input[name=w]").val());
+	h = parseFloat($("input[name=h]").val());
+	points = parseFloat($("select[name=points]").val());
 	integration = parseFloat($("input[name=integration]").val());
-	scantype = $("select[name=scantype]").val();
+	if (s_type==""){
+		scantype = $("select[name=scantype]").val();
+	} else {
+		scantype = s_type;
+	}
 	st = ang/steps;
 	console.log(scantype);
 	console.log("!");
@@ -47,6 +55,27 @@ function generate_prog()
 				coords.push([i*st,0*st]);
 		}
 		t.append("G01 A0\n");
+	} else if(scantype=="sq") {
+		t.append("#&lt;_x0&gt; = #&lt;_x&gt;\n")
+		t.append("#&lt;_y0&gt; = #&lt;_y&gt;\n")
+		t.append("G01 X[#&lt;_x0&gt;+"+w*0.1+"] Y[#&lt;_y0&gt;-"+h*0.1+ "]\n");
+		t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+
+		t.append("G01 X[#&lt;_x0&gt;+"+w*0.9+"] Y[#&lt;_y0&gt;-"+h*0.1+ "]\n");
+		t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+
+		t.append("G01 X[#&lt;_x0&gt;+"+w*0.9+"] Y[#&lt;_y0&gt;-"+h*0.9+ "]\n");
+		t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+
+		t.append("G01 X[#&lt;_x0&gt;+"+w*0.1+"] Y[#&lt;_y0&gt;-"+h*0.9+ "]\n");
+		t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+		if (points==5.){
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.5+"] Y[#&lt;_y0&gt;-"+h*0.5+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+		}
+		
+		
+		t.append("G01 X#&lt;_x0&gt; Y#&lt;_y0&gt;\n");
 	}
 	csv = $("textarea.csv");
 	csv.text("");

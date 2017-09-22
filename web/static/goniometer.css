@@ -121,6 +121,22 @@ textarea.csv {
 	width: 20%;
 	height: 300px;
 }
+.frame.prog {width: 300px;}
 
+.frame{
+	border: #aaa 1px solid;
+	margin: 5px 2px;
+	padding: 10px 2px;
+	border-radius: 5px 5px 5px 5px;
+}
 
-
+.frame h3{
+	position:relative;
+	font-size: 16px;
+	margin: 2px;
+	padding: 0px;
+	}
+	
+.prog ul input, .prog ul select{width:80px;  float:right;}
+.prog ul li {height: 22px;}
+.prog input.button {width: auto; margin:10px;}

@@ -50,20 +50,43 @@
 			<input type="button" value="Start" onclick="prog_start()">
 			<input type="button" value="Stop" onclick="prog_stop()">
 			<span class="pin-in led on mdi-busy"></span>
-			<ul class="prog">
-				<li>Максимальный угол <input type="number" name="maxang" value="10" step="0.01">
-				<li>Количество шагов <input type="number" name="steps" value="5" min="1">
-				<li>Тип сканирования
-					<select name="scantype">
-						<option value="sphere" selected>Сфера</option>
-						<option value="vert" >Вертикаль</option>
-						<option value="hor"  >Горизонталь</option>
-					</select>
-			</ul>
-	
-			Integration time <input type="number" name="integration" value="2" step="0.1">
 			
-			<input type="button" value="Генерация программы сканирования" onclick="generate_prog()">
+			<div class="frame prog">
+						Integration time <input type="number" name="integration" value="2" step="0.1">
+				<div class="frame">
+					<h3>Угловое сканирование</h3>
+					<ul class="prog">
+					
+						<li>Максимальный угол <input type="number" name="maxang" value="10" step="0.01">
+						<li>Количество шагов <input type="number" name="steps" value="5" min="1">
+						<li>Тип сканирования
+							<select name="scantype">
+								<option value="sphere" selected>Сфера</option>
+								<option value="vert" >Вертикаль</option>
+								<option value="hor"  >Горизонталь</option>
+							</select>
+					</ul>
+					<input type="button" value="Генерация программы сканирования" onclick="generate_prog()">					
+				</div>	
+				<div class="frame">
+					<h3>Сканирование экрана</h3>
+					<ul class="prog">
+					
+						<li>Ширина <input type="number" name="w" value="300" min="1">
+						<li>Высота <input type="number" name="h" value="200" min="1">
+						<li>Тип сканирования
+							<select name="points">
+								<option value="4" selected>4 точки</option>
+								<option value="5" >5 точек</option>
+							</select>
+						<li>(Референсная точка левый верхний угол) 
+					</ul>
+					<input type="button" value="Генерация программы сканирования" onclick="generate_prog('sq')">					
+				</div>	
+			</div>
+
+			
+
 
 		</div>	
 

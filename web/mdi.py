@@ -20,7 +20,8 @@ try:
 				if l.strip() == "" :
 					continue
 				c.mdi(l)
-				c.wait_complete() # wait until mode switch executed
+				while c.wait_complete()!=1 :
+					pass # wait until mode switch executed
 			h["busy"] = False
 		last_run = h["run"]
 		time.sleep(0.04)

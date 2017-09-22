@@ -1,5 +1,5 @@
-T1 P1 W1000 ;laser 
-T2 P2 U131 V-32.8 W1000 ;nikon lens 
-T3 P3 U-55.6 V-41.27 W1064 ;radiometer 
-T4 P4 W1000 ;added 20170714 
+T1 P1 U-133.27 V-9.69 W1000 ;laser 
+T2 P2 U-2.27 V-132 W1000 ;nikon lens 
+T3 P3 U-188.87 V-73.69 W1000 ;radiometer 
+T4 P4 V-73.69 W1000 ;added 20170714 
 T5 P5 W1000 ;added 20170811 
