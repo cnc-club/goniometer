@@ -5,7 +5,7 @@ function pin_name(el) {
 	return l[l.length-1];
 }
 
-function generate_prog(s_type="")
+function generate_prog(s_type)
 {
 
 	t = $("textarea.prog");
@@ -17,7 +17,7 @@ function generate_prog(s_type="")
 	h = parseFloat($("input[name=h]").val());
 	points = parseFloat($("select[name=points]").val());
 	integration = parseFloat($("input[name=integration]").val());
-	if (s_type==""){
+	if (s_type=="" || s_type==undefined ){
 		scantype = $("select[name=scantype]").val();
 	} else {
 		scantype = s_type;
@@ -58,19 +58,60 @@ function generate_prog(s_type="")
 	} else if(scantype=="sq") {
 		t.append("#&lt;_x0&gt; = #&lt;_x&gt;\n")
 		t.append("#&lt;_y0&gt; = #&lt;_y&gt;\n")
-		t.append("G01 X[#&lt;_x0&gt;+"+w*0.1+"] Y[#&lt;_y0&gt;-"+h*0.1+ "]\n");
-		t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
 
-		t.append("G01 X[#&lt;_x0&gt;+"+w*0.9+"] Y[#&lt;_y0&gt;-"+h*0.1+ "]\n");
-		t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+		
+		if (points==5.){	
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.1+"] Y[#&lt;_y0&gt;-"+h*0.1+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
 
-		t.append("G01 X[#&lt;_x0&gt;+"+w*0.9+"] Y[#&lt;_y0&gt;-"+h*0.9+ "]\n");
-		t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.9+"] Y[#&lt;_y0&gt;-"+h*0.1+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
 
-		t.append("G01 X[#&lt;_x0&gt;+"+w*0.1+"] Y[#&lt;_y0&gt;-"+h*0.9+ "]\n");
-		t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
-		if (points==5.){
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.9+"] Y[#&lt;_y0&gt;-"+h*0.9+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.1+"] Y[#&lt;_y0&gt;-"+h*0.9+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+
 			t.append("G01 X[#&lt;_x0&gt;+"+w*0.5+"] Y[#&lt;_y0&gt;-"+h*0.5+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+		}
+		else if (points==9.){		
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.1+"] Y[#&lt;_y0&gt;-"+h*0.1+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.5+"] Y[#&lt;_y0&gt;-"+h*0.1+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.9+"] Y[#&lt;_y0&gt;-"+h*0.1+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.1+"] Y[#&lt;_y0&gt;-"+h*0.5+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.5+"] Y[#&lt;_y0&gt;-"+h*0.5+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.9+"] Y[#&lt;_y0&gt;-"+h*0.5+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.1+"] Y[#&lt;_y0&gt;-"+h*0.9+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.5+"] Y[#&lt;_y0&gt;-"+h*0.9+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.9+"] Y[#&lt;_y0&gt;-"+h*0.9+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+
+
+			
+		}
+		else { // 4 points
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.1+"] Y[#&lt;_y0&gt;-"+h*0.1+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.9+"] Y[#&lt;_y0&gt;-"+h*0.1+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.9+"] Y[#&lt;_y0&gt;-"+h*0.9+ "]\n");
+			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+
+			t.append("G01 X[#&lt;_x0&gt;+"+w*0.1+"] Y[#&lt;_y0&gt;-"+h*0.9+ "]\n");
 			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
 		}
 		
