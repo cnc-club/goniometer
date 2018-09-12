@@ -30,6 +30,11 @@ function generate_prog(s_type)
 	t.append("G1 U0 V0\n");
 	t.append("G1 W0\n");
 	coords = []
+	
+	csv = $("textarea.csv");
+	csv.text("");
+	
+	
 	if (scantype=="sphere"){
 		for (i=-steps;i<=steps;i++){
 			for (j=-steps;j<=steps;j++){
@@ -39,6 +44,15 @@ function generate_prog(s_type)
 			}
 		}
 		t.append("G01 A0 B0\n");		
+
+		i = 0;
+		csv.append("Номер	A	B\n");
+		for (a1 in coords) {
+			a = coords[a1];
+			i+=1;
+			csv.append(i+"	"+a[0]+"	"+a[1]+"\n");
+		}
+
 		
 	} else if(scantype=="vert") {
 		for (i=-steps;i<=steps;i++){
@@ -48,6 +62,15 @@ function generate_prog(s_type)
 		}
 		t.append("G01 B0\n");
 
+		i = 0;
+		csv.append("Номер	A	B\n");
+		for (a1 in coords) {
+			a = coords[a1];
+			i+=1;
+			csv.append(i+"	"+a[0]+"	"+a[1]+"\n");
+		}
+
+
 	} else if(scantype=="hor") {
 		for (i=-steps;i<=steps;i++){
 				t.append("G01 A"+i*st+"\n");
@@ -55,6 +78,15 @@ function generate_prog(s_type)
 				coords.push([i*st,0*st]);
 		}
 		t.append("G01 A0\n");
+		
+		i = 0;
+		csv.append("Номер	A	B\n");
+		for (a1 in coords) {
+			a = coords[a1];
+			i+=1;
+			csv.append(i+"	"+a[0]+"	"+a[1]+"\n");
+		}
+		
 	} else if(scantype=="sq") {
 		t.append("#&lt;_x0&gt; = #&lt;_x&gt;\n")
 		t.append("#&lt;_y0&gt; = #&lt;_y&gt;\n")
@@ -75,6 +107,16 @@ function generate_prog(s_type)
 
 			t.append("G01 X[#&lt;_x0&gt;+"+w*0.5+"] Y[#&lt;_y0&gt;-"+h*0.5+ "]\n");
 			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+			
+			
+			csv.append("Точка\n");
+			csv.append("ЛВУ\n");
+			csv.append("ПВУ\n");
+			csv.append("ПНУ\n");
+			csv.append("ЛНУ\n");
+			csv.append("ЦЕНТР\n");
+
+			
 		}
 		else if (points==9.){		
 			t.append("G01 X[#&lt;_x0&gt;+"+w*0.1+"] Y[#&lt;_y0&gt;-"+h*0.1+ "]\n");
@@ -98,7 +140,17 @@ function generate_prog(s_type)
 			t.append("G01 X[#&lt;_x0&gt;+"+w*0.9+"] Y[#&lt;_y0&gt;-"+h*0.9+ "]\n");
 			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
 
-
+			csv.append("Точка\n");
+			csv.append("1\n");
+			csv.append("2\n");
+			csv.append("3\n");
+			csv.append("4\n");
+			csv.append("5\n");
+			csv.append("6\n");
+			csv.append("7\n");
+			csv.append("8\n");
+			csv.append("9\n");
+			
 			
 		}
 		else { // 4 points
@@ -113,20 +165,20 @@ function generate_prog(s_type)
 
 			t.append("G01 X[#&lt;_x0&gt;+"+w*0.1+"] Y[#&lt;_y0&gt;-"+h*0.9+ "]\n");
 			t.append("O&lt;trigger&gt; CALL ["+integration+"]\n");
+
+			csv.append("Точка\n");
+			csv.append("ЛВУ\n");
+			csv.append("ПВУ\n");
+			csv.append("ПНУ\n");
+			csv.append("ЛНУ\n");
+
 		}
 		
 		
 		t.append("G01 X#&lt;_x0&gt; Y#&lt;_y0&gt;\n");
 	}
-	csv = $("textarea.csv");
-	csv.text("");
-	i = 0;
-	csv.append("Номер	A	B\n");
-	for (a1 in coords) {
-		a = coords[a1];
-		i+=1;
-		csv.append(i+"	"+a[0]+"	"+a[1]+"\n");
-	}
+
+
 }
 
 
